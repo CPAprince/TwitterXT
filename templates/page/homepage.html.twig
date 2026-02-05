@@ -1,0 +1,25 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}All tweets{% endblock %}
+
+{% block content %}
+    <h1 class="mb-2 p-3">All tweets</h1>
+    <div
+        class="tweets-section"
+        data-tweets-url="{{ path('tweets_get_all') }}"
+        data-tweets-show-edit="1"
+        data-tweets-infinite="1"
+        data-tweets-limit="50"
+    ></div>
+
+    <div class="tweets-sentinel"></div>
+    {% include 'component/_tweet_templates.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/tweets_list.js') }}"></script>
+    <script src="{{ asset('js/tweets.js') }}"></script>
+    <script src="{{ asset('js/tweet.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Twitter | Registration{% endblock %}
+
+{% block content %}
+    <h1 class="mb-3">Registration</h1>
+
+    {% include 'component/_registration_form.html.twig' %}
+    {% include 'component/_alert_placeholder.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/registration.js') }}"></script>
+{% endblock %}

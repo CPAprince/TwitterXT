@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Go to project root (../ from tools/)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+# Docker PHP container name (default: "php")
+PHP_CONTAINER="${PHP_CONTAINER:-php}"
+DOCKER_COMPOSE="${DOCKER_COMPOSE:-docker compose}"
+COMPOSER_CMD="$DOCKER_COMPOSE exec -T ${PHP_CONTAINER} composer"
+
+CS_FIXER_BIN="vendor/bin/php-cs-fixer"
+
+echo "[cs-fixer] Project root: $PROJECT_ROOT"
+
+# 1) Ensure PHP-CS-Fixer is installed
+if [ ! -f "$CS_FIXER_BIN" ]; then
+  echo "[cs-fixer] PHP-CS-Fixer is not installed. Installing..."
+  # --no-scripts щоб не запускати symfony cache:clear, assets:install і т.п.
+  $COMPOSER_CMD require --dev --no-interaction --no-scripts friendsofphp/php-cs-fixer
+  echo "[cs-fixer] Installation completed."
+else
+  echo "[cs-fixer] PHP-CS-Fixer already installed."
+fi
+
+# 2) Decide mode: default = check, "--fix" = auto-fix
+MODE="${1:-check}"
+
+if [ "$MODE" = "--fix" ] || [ "$MODE" = "fix" ]; then
+  echo "[cs-fixer] Running fixer (composer cs:fix)..."
+  $COMPOSER_CMD cs:fix
+else
+  echo "[cs-fixer] Running check (composer cs:check)..."
+  $COMPOSER_CMD cs:check
+fi

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Twitter\Profile\Domain\Profile\Model\Profile"
+            repository-class="Twitter\Profile\Domain\Profile\Model\ProfileRepository"
+            table="profiles">
+
+        <id name="userId" column="user_id" type="uuid">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="name" column="name" length="50"/>
+        <field name="bio" column="bio" length="300" nullable="true"/>
+        <field name="createdAt" column="created_at" type="datetime_immutable" updatable="false"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+    </entity>
+
+</doctrine-mapping>

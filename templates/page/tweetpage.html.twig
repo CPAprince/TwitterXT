@@ -1,0 +1,106 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Tweet{% endblock %}
+
+{% block content %}
+
+    <div id="tweet-error" class="p-4 text-center" style="display: none;">
+        <div class="mb-2 text-muted" id="tweet-error-status" style="font-size: 3rem; font-weight: 700; line-height: 1;">
+            404
+        </div>
+        <p class="text-muted mb-1" id="tweet-error-message">Tweet not found</p>
+        <p class="text-muted small mb-3" id="tweet-error-details">
+            The tweet you're looking for doesn't exist or has been deleted.
+        </p>
+        <a href="{{ path('homepage') }}" class="btn btn-outline-primary mt-1">Go Home</a>
+    </div>
+
+    <div class="tweet p-3 border-bottom" style="visibility: hidden;">
+        <div class="d-flex align-items-center mb-1">
+            <span class="fw-bold me-2" tweet_author>{ tweet.author.name }</span>
+            <span class="text-muted" tweet_createdAt>
+                · { tweet.createdAt|date('H:i') }
+        </span>
+        </div>
+
+        <div class="tweet-content-display">
+            <p class="mb-2" data-tweet-content></p>
+        </div>
+
+        <div class="tweet-edit-form" style="display: none;">
+            <div class="tweet-form-container" data-form-mode="edit" data-tweet-id="">
+                <form class="tweet-form">
+                    <textarea
+                        class="form-control mb-2"
+                        name="content"
+                        rows="3"
+                        maxlength="280"
+                        data-char-counter
+                        placeholder="What's happening?"
+                        required
+                    ></textarea>
+
+                    <div class="d-flex justify-content-end mb-2">
+                        {% include 'component/_char_counter.html.twig' with { maxlength: 280 } only %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        <button type="button" class="btn btn-secondary btn-sm tweet-form-cancel">Cancel</button>
+                    </div>
+
+                    <div class="tweet-form-alerts mt-2"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="tweet-actions d-flex justify-content-between w-75">
+            <div class="d-flex gap-3 align-items-center">
+                <button class="btn btn-link btn-sm p-0 tweet-like-btn"
+                        data-tweet-id=""
+                        data-liked=""
+                        type="button"
+                        style="text-decoration: none; color: inherit;">
+                    <i class="far fa-thumbs-up tweet-like-icon"></i>
+                    <span class="tweet-like-count" tweet_likes>0</span>
+                </button>
+
+                <button class="btn btn-link btn-sm p-0 tweet-edit-btn"
+                        data-tweet-id=""
+                        data-author-id=""
+                        style="display: none;">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tweetId = window.location.pathname.replace('/t/', '');
+            console.log('tweetId: ', tweetId);
+            const tweetData = await getTweet(tweetId);
+            if (tweetData) {
+                showTweet(tweetData);
+                return;
+            }
+
+            const errorBlock = document.getElementById('tweet-error');
+            if (errorBlock) {
+                errorBlock.style.display = 'block';
+            }
+        });
+    </script>
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/tweet.js') }}"></script>
+    <script src="{{ asset('js/tweets.js') }}"></script>
+    <script src="{{ asset('js/auth.js') }}"></script>
+
+{% endblock %}

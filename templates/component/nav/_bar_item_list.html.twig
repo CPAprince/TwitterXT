@@ -1,0 +1,13 @@
+<div class="p-3">
+    {% if items is not empty %}
+        {% for item in items %}
+            {% include 'component/nav/_bar_item.html.twig' with {
+                href: item.href,
+                icon: item.icon,
+                text: item.text,
+                id: item.id|default(null),
+                class: item.class|default(null),
+            } only %}
+        {% endfor %}
+    {% endif %}
+</div>

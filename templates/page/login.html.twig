@@ -1,0 +1,24 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Twitter | Login{% endblock %}
+
+{% block content %}
+    <h1 class="mb-3">Login</h1>
+
+    {% include 'component/_login_form.html.twig' %}
+    {% include 'component/_alert_placeholder.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.routes = {
+            login: '{{ path('api_login_check') }}',
+            successRedirect: '{{ path('homepage') }}',
+        };
+    </script>
+
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/login.js') }}"></script>
+{% endblock %}

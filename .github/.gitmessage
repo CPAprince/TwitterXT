@@ -1,0 +1,17 @@
+# Subject in Conventional Commits format
+
+# Body: Provide a detailed explanation why changes were made
+
+# How to Write a Git Commit Message:
+# https://chris.beams.io/posts/git-commit
+#
+# Follow the Conventional Commits format:
+# https://www.conventionalcommits.org/en/v1.0.0
+#
+# 1. Capitalize the subject line
+# 2. Try to put it in 50 chars or less
+# 3. Do not end the subject line with a period
+# 4. Separate subject from body with a blank line
+# 5. Use the imperative mood in the subject line
+# 6. Use the body to explain what and why vs how
+# 7. Wrap the body at 72 characters

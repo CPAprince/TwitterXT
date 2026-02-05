@@ -1,0 +1,62 @@
+<form id="registration-form" method="post">
+    <div class="mb-3">
+        <label class="form-label" for="name">Your name</label>
+        <input class="form-control"
+               type="text"
+               name="name"
+               id="name"
+               maxlength="50"
+               data-char-counter
+               autocomplete="name"
+               required>
+        <div class="d-flex justify-content-end mt-1">
+            {% include 'component/_char_counter.html.twig' with { maxlength: 50 } only %}
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="bio">About you</label>
+        <input class="form-control"
+               type="text"
+               name="bio"
+               id="bio"
+               autocomplete="off"
+               maxlength="300"
+               data-char-counter>
+        <div class="d-flex justify-content-end mt-1">
+            {% include 'component/_char_counter.html.twig' with { maxlength: 300 } only %}
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-control"
+               type="email"
+               name="email"
+               id="email"
+               autocomplete="email"
+               required>
+        <div class="form-text">
+            Enter a valid email address (e.g., user@example.com).
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-control"
+               type="password"
+               name="password"
+               id="password"
+               autocomplete="new-password"
+               required>
+        <div class="form-text">
+            Must contain at least 8 characters:
+            <ul class="mb-0 ps-3">
+                <li>One uppercase letter (A-Z)</li>
+                <li>One lowercase letter (a-z)</li>
+                <li>One digit (0-9)</li>
+                <li>One special character (# ? ! @ $ % ^ &amp; * - _ .)</li>
+            </ul>
+        </div>
+    </div>
+    <button class="btn btn-primary mb-3" type="submit">
+        Register
+    </button>
+</form>

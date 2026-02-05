@@ -1,0 +1,63 @@
+name: PHPStan
+
+on:
+  pull_request:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+    
+    container:
+      image: php:8.4-cli
+    
+    steps:
+      - name: Install system dependencies (git, unzip, zip extension)
+        run: |
+          apt-get update
+          apt-get install -y git unzip libzip-dev zlib1g-dev
+          docker-php-ext-configure zip
+          docker-php-ext-install zip
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Mark workspace as safe for git (for PHPStan)
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install Composer
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          rm composer-setup.php
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Warm up Symfony dev cache and ensure container XML
+        env:
+          APP_ENV: dev
+          APP_DEBUG: 1
+        run: |
+          php bin/console cache:clear --env=dev
+          php bin/console cache:warmup --env=dev
+          
+          mkdir -p var/cache/dev
+          php bin/console debug:container --env=dev --format=xml > var/cache/dev/App_KernelDevDebugContainer.xml
+          
+          echo "=== var/cache/dev contents ==="
+          ls -l var/cache/dev || true
+          
+          if [ ! -f var/cache/dev/App_KernelDevDebugContainer.xml ]; then
+              echo "Expected Symfony container XML not found at var/cache/dev/App_KernelDevDebugContainer.xml"
+              ls -R var/cache/dev || true
+              exit 1
+          fi
+
+      - name: Run PHPStan
+        env:
+          APP_ENV: dev
+          APP_DEBUG: 1
+        run: composer phpstan

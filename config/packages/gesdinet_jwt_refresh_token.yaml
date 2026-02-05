@@ -1,0 +1,5 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: Twitter\IAM\Domain\User\Model\RefreshToken
+    ttl: 604800
+    token_parameter_name: refresh_token
+

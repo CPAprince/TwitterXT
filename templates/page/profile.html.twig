@@ -1,0 +1,65 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Profile - {{ profile.name }}{% endblock %}
+
+{% block content %}
+    <div class="profile-header p-3 border-bottom">
+        <h1 class="mb-2">{{ profile.name }}</h1>
+        {% if profile.bio %}
+            <p class="text-muted mb-2">{{ profile.bio }}</p>
+        {% else %}
+            <p class="text-muted mb-2"><em>No bio yet.</em></p>
+        {% endif %}
+        <small class="text-muted">
+            Joined {{ profile.createdAt|date('F Y') }}
+        </small>
+
+        <div id="profile-edit-section" class="mt-3" style="display: none;">
+            {% include 'component/_profile_edit_form.html.twig' %}
+        </div>
+
+        <button id="edit-profile-btn" class="btn btn-outline-primary btn-sm mt-2" style="display: none;">
+            <i class="fas fa-edit"></i> Edit Profile
+        </button>
+    </div>
+
+    <div id="tweet-create-section" class="p-3 border-bottom" style="display: none;">
+        <h5 class="mb-3">Create New Tweet</h5>
+        {% include 'component/_tweet_form.html.twig' with {
+            formId: 'tweet-create-form',
+            alertsContainerId: 'tweet-create-alerts'
+        } only %}
+    </div>
+
+    <div
+        class="tweets-section"
+        data-tweets-url="{{ path('tweets_get_by_user', { userId: profile.userId }) }}"
+        data-tweets-infinite="1"
+        data-tweets-limit="50"
+    ></div>
+
+    <div class="tweets-sentinel"></div>
+
+    {% include 'component/_tweet_templates.html.twig' %}
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.profileData = {
+            userId: '{{ profile.userId }}',
+            name: {{ profile.name|json_encode|raw }},
+            bio: {{ profile.bio|json_encode|raw }},
+        };
+        window.routes = window.routes || {};
+        window.routes.createTweet = '{{ path('api_create_tweet') }}';
+    </script>
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/auth.js') }}"></script>
+    <script src="{{ asset('js/tweets_list.js') }}"></script>
+    <script src="{{ asset('js/tweet.js') }}"></script>
+    <script src="{{ asset('js/tweets.js') }}"></script>
+    <script src="{{ asset('js/profile.js') }}"></script>
+{% endblock %}

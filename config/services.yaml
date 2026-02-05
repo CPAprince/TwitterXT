@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Twitter\Shared\Infrastructure\EventSubscriber\ExceptionSubscriber:
+        tags: [ 'kernel.event_subscriber' ]
+        arguments:
+            $environment: '%kernel.environment%'
+
+    Twitter\Shared\Infrastructure\EventSubscriber\DoctrineResetSubscriber:
+        tags: [ 'kernel.event_subscriber' ]
+
+    Twitter\Shared\Infrastructure\EventSubscriber\JWTCreatedListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created }
+
+    Twitter\IAM\UI\REST\Controller\:
+        resource: '../src/IAM/UI/REST/Controller/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+        
+    Twitter\IAM\UI\Web\:
+        resource: '../src/IAM/UI/Web/*/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\Registration\UI\REST\Controller\:
+        resource: '../src/Registration/UI/REST/Controller/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\IAM\Application\CreateUser\CreateUserCommandHandler:
+        arguments:
+            $userRepository: '@Twitter\IAM\Domain\User\Model\UserRepository'
+
+    Twitter\Registration\Application\UseCase\RegisterUser\RegisterUserCommandHandler:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    Twitter\IAM\Application\Logout\LogoutHandler:
+        arguments:
+            $repository: '@Twitter\IAM\Application\Logout\RefreshTokenRepository'
+
+    Twitter\IAM\Infrastructure\Auth\RefreshTokenHasher:
+        arguments:
+            $secret: '%env(APP_SECRET)%'
+
+    Twitter\IAM\Domain\User\Model\UserRepository:
+        class: Twitter\IAM\Infrastructure\Persistence\MySQL\Repository\MySQLUserRepository
+        tags: [ 'doctrine.repository_service' ]
+
+    Twitter\IAM\Application\Logout\RefreshTokenRepository:
+        class: Twitter\IAM\Infrastructure\Persistence\MySQL\Repository\MySQLRefreshTokenRepository
+
+    Twitter\Profile\UI\REST\Controller\:
+        resource: '../src/Profile/UI/REST/Controller/*/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\Profile\UI\Web\:
+        resource: '../src/Profile/UI/Web/*/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\Like\UI\REST\Controller\:
+        resource: '../src/Like/UI/REST/Controller/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\Profile\Application\UseCase\CreateProfile\CreateProfileCommandHandler:
+        arguments:
+            $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
+    
+    Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler:
+        arguments:
+            $likeRepository: '@Twitter\Like\Domain\Like\Model\LikeRepository'
+            
+    Twitter\Profile\Application\UseCase\GetProfile\GetProfileQueryHandler:
+        arguments:
+            $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
+
+    Twitter\Profile\Application\UseCase\UpdateProfile\UpdateProfileCommandHandler:
+        arguments:
+            $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
+
+    Twitter\Profile\Domain\Profile\Model\ProfileRepository:
+        class: Twitter\Profile\Infrastructure\Persistence\MySQL\Repository\MySQLProfileRepository
+
+    Twitter\Tweet\UI\REST\:
+        resource: '../src/Tweet/UI/REST/*/*Controller.php'
+        tags: [ 'controller.service_arguments' ]
+
+    Twitter\Tweet\Domain\Tweet\Model\TweetRepository:
+        class: Twitter\Tweet\Infrastructure\Persistence\MySQL\Repository\MySQLTweetRepository
+
+    Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+    
+    Twitter\Like\Domain\Like\Model\LikeRepository:
+        class: Twitter\Like\Infrastructure\Persistence\MySQL\Repository\MySQLLikeRepository
+
+    Twitter\Tweet\UI\Web\:
+        resource: '../src/Tweet/UI/Web/'
+        tags: [ 'controller.service_arguments' ]
+        
+    Twitter\Tweet\Application\UseCase\GetTweet\GetTweetCommandHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
+            
+    Twitter\Tweet\Application\UseCase\GetTweets\GetTweetsCommandHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
+            
+    Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            
+    Twitter\Tweet\Application\UseCase\GetUserTweets\GetUserTweetsQueryHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+
+    Twitter\Tweet\Application\EventSubscriber\UpdateTweetLikesCountSubscriber:
+        tags: [ 'kernel.event_subscriber' ]
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+
+    Twitter\Realtime\Infrastructure\EventSubscriber\LikeBroadcastSubscriber:
+        tags: [ 'kernel.event_subscriber' ]
+        arguments:
+            $hub: '@Symfony\Component\Mercure\HubInterface'
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            $topicBaseUrl: '%env(DEFAULT_URI)%'
+            $logger: '@logger'

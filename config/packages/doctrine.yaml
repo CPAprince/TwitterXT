@@ -1,0 +1,64 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        profiling_collect_backtrace: '%kernel.debug%'
+        charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collation: utf8mb4_0900_ai_ci
+
+    orm:
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            IAM:
+                type: xml
+                dir: '%kernel.project_dir%/src/IAM/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: Twitter\IAM\Domain
+                is_bundle: false
+            RefreshToken:
+                type: xml
+                dir: '%kernel.project_dir%/src/IAM/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: Twitter\IAM\Domain
+                is_bundle: false
+            Profile:
+                type: xml
+                dir: '%kernel.project_dir%/src/Profile/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: Twitter\Profile\Domain
+                is_bundle: false
+            Tweet:
+                type: xml
+                dir: '%kernel.project_dir%/src/Tweet/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: Twitter\Tweet\Domain
+                is_bundle: false
+            Like:
+                type: xml
+                dir: '%kernel.project_dir%/src/Like/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: Twitter\Like\Domain
+                is_bundle: false
+when@test:
+    doctrine:
+        dbal:
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            metadata_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

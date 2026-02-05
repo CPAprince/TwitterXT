@@ -1,0 +1,10 @@
+{# templates/component/_char_counter.html.twig #}
+{#
+  Parameters:
+  - maxlength (required): maximum allowed characters
+  - initialCount (optional): initial current count, defaults to 0
+#}
+<div class="char-counter-display text-muted small">
+    <span class="char-counter-current">{{ initialCount|default(0) }}</span>/{{ maxlength }}
+</div>
+

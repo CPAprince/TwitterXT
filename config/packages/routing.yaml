@@ -1,0 +1,9 @@
+framework:
+    router:
+        # See https://symfony.com/doc/current/routing.html#generating-urls-in-commands
+        default_uri: '%env(DEFAULT_URI)%'
+
+when@prod:
+    framework:
+        router:
+            strict_requirements: null

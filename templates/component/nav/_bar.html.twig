@@ -1,0 +1,32 @@
+{% set items = [
+    {'href': path('homepage'), 'icon': 'home', 'text': 'Home'},
+    {'href': '#', 'icon': 'user', 'text': 'Profile', 'id': 'nav-profile-link', 'class': 'auth-user-only'},
+    {'href': path('registration'), 'icon': 'user-plus', 'text': 'Register', 'class': 'auth-guest-only'},
+    {'href': path('login'), 'icon': 'arrow-right-to-bracket', 'text': 'Login', 'class': 'auth-guest-only'},
+    {'href': '#', 'icon': 'arrow-right-from-bracket', 'text': 'Logout', 'id': 'nav-logout-link', 'class': 'auth-user-only'},
+] %}
+
+<nav class="navbar border-bottom d-md-none sticky-top bg-white">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center">
+            <i class="fab fa-twitter fa-2x text-primary me-2"></i>
+            <span class="fw-bold text-primary h4 mb-0">Twitter</span>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="collapse navbar-collapse" id="mobileMenu">
+        {% include 'component/nav/_bar_item_list.html.twig' with {items: items} %}
+    </div>
+</nav>
+
+<div class="col-md-3 d-none d-md-block position-fixed h-100 border-end">
+    <div class="d-flex flex-column p-3">
+        <div class="mb-4">
+            <i class="fab fa-twitter fa-2x text-primary"></i>
+            <span class="fw-bold text-primary h2">Twitter</span>
+        </div>
+        {% include 'component/nav/_bar_item_list.html.twig' with {items: items} %}
+    </div>
+</div>

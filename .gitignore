@@ -1,0 +1,27 @@
+/.idea/
+/.vscode/
+
+/docker/db/data
+bolt.db
+
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+/.composer-cache/
+
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+
+.phpunit.cache
+.phpunit.result.cache
+/phpunit.xml
+
+/src/IAM/UI/CLI/Dev/
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

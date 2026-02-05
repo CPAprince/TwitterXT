@@ -1,0 +1,25 @@
+span.fw-bold.me-2 > a {
+    color: var(--bs-body-color);
+    text-decoration: none;
+}
+
+.tweets-sentinel {
+    height: 1px;
+}
+
+.tweet-like-tooltip-wrapper.is-guest-disabled {
+    cursor: not-allowed;
+}
+
+.tweet-like-tooltip-wrapper.is-guest-disabled .tweet-like-icon {
+    opacity: 0.5;
+}
+
+.tweet-like-tooltip-wrapper.is-guest-disabled .tweet-like-count {
+    opacity: 1;
+}
+
+.tweet-like-tooltip-wrapper.is-guest-disabled .tweet-like-btn:disabled {
+    cursor: not-allowed;
+}
+

@@ -1,0 +1,46 @@
+name: Docker
+
+on:
+  push:
+
+jobs:
+  lint:
+    name: Docker Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          recursive: true
+  docker:
+    name: Docker Build
+    strategy:
+      matrix:
+        os: [ 'ubuntu-22.04' ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v3
+      - name: Build Docker images
+        uses: docker/bake-action@v6
+        with:
+          load: 'true'
+          pull: 'true'
+          source: .
+          files: |
+            compose.yaml
+            compose.override.yaml
+          set: |
+            php.cache-from=type=gha,scope=php-${{ github.ref }}
+            php.cache-from=type=gha,scope=php-refs/heads/main
+            php.cache-to=type=gha,scope=php-${{ github.ref }},mode=max
+      - name: Build images
+        run: docker compose build --pull --no-cache
+      - name: Start services
+        run: docker compose up --wait --no-build
+      - name: Check HTTP reachability
+        run: curl -v --fail-with-body http://localhost/api/health
+      - name: Check HTTPS reachability
+        run: curl -vk --fail-with-body https://localhost/api/health

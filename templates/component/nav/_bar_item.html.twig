@@ -1,0 +1,5 @@
+{% set current = app.request.pathInfo == href or (id == 'nav-profile-link' and app.request.pathInfo starts with '/p/') %}
+<a class="sidebar-item mb-2 text-decoration-none text-dark d-block {% if current %} fw-bold {% endif %} {{ class|default('') }}" href={{ href }} {% if id %}id="{{ id }}"{% endif %}>
+    <i class="fas fa-{{ icon }} me-2"></i>
+    <span>{{ text }}</span>
+</a>

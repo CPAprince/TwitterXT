@@ -1,0 +1,40 @@
+name: PHP-CS-Fixer
+
+on:
+    pull_request:
+    push:
+        branches: [ main, develop ]
+
+jobs:
+    cs-fixer:
+        runs-on: ubuntu-latest
+
+        container:
+            image: php:8.4-cli
+
+        steps:
+            - name: Install system dependencies (git, unzip, zip extension)
+              run: |
+                  apt-get update
+                  apt-get install -y git unzip libzip-dev zlib1g-dev
+                  docker-php-ext-configure zip
+                  docker-php-ext-install zip
+                  rm -rf /var/lib/apt/lists/*
+
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Mark workspace as safe for git (for PHP-CS-Fixer)
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Install Composer
+              run: |
+                  php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+                  php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+                  rm composer-setup.php
+
+            - name: Install dependencies
+              run: composer install --no-interaction --prefer-dist
+
+            - name: Run PHP-CS-Fixer (check)
+              run: composer cs:check
