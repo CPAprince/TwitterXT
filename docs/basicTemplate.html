@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Clone</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    .sidebar-item {
+      padding: 12px 15px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .sidebar-item:hover {
+      background-color: #e8f5fd;
+    }
+    .tweet-input {
+      border: none;
+      resize: none;
+    }
+    .tweet-input:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    .tweet-actions i {
+      color: #536471;
+    }
+    .tweet-actions i:hover {
+      color: #1da1f2;
+    }
+  </style>
+</head>
+<body>
+<!-- Mobile Top Bar -->
+<nav class="navbar navbar-light bg-white border-bottom d-md-none sticky-top">
+  <div class="container-fluid">
+
+    <div class="d-flex align-items-center">
+      <i class="fab fa-twitter fa-2x text-primary me-2"></i>
+      <span class="fw-bold text-primary h4 mb-0">Twitter</span>
+    </div>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </div>
+
+  <div class="collapse navbar-collapse" id="mobileMenu">
+    <div class="p-3">
+      <div class="sidebar-item mb-2">
+        <i class="fas fa-home me-2"></i> Home
+      </div>
+      <div class="sidebar-item">
+        <i class="far fa-solid fa-user-plus me-2"></i> Register
+      </div>
+      <div class="sidebar-item">
+        <i class="far fa-solid fa-arrow-right-to-bracket me-2"></i> Login
+      </div>
+      <div class="sidebar-item">
+        <i class="far fa-user me-2"></i> Profile
+      </div>
+      <div class="sidebar-item">
+        <i class="far fa-solid fa-arrow-right-from-bracket me-2"></i> Logout
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Left Sidebar (Desktop only) -->
+    <div class="col-md-3 d-none d-md-block position-fixed h-100 border-end">
+      <div class="d-flex flex-column p-3">
+        <div class="mb-4">
+          <i class="fab fa-twitter fa-2x text-primary"></i>
+          <span class="fw-bold text-primary h2">Twitter</span>
+        </div>
+
+        <div class="sidebar-item mb-2">
+          <i class="fas fa-home me-2"></i>
+          <span class="fw-bold">Home</span>
+        </div>
+
+        <div class="sidebar-item mb-2">
+          <i class="far fa-solid fa-user-plus me-2"></i>
+          <span>Register</span>
+        </div>
+
+        <div class="sidebar-item mb-2">
+          <i class="far fa-solid fa-arrow-right-to-bracket me-2"></i>
+          <span>Login</span>
+        </div>
+
+        <div class="sidebar-item mb-2">
+          <i class="far fa-user me-2"></i>
+          <span>Profile</span>
+        </div>
+
+        <div class="sidebar-item mb-2">
+          <i class="far fa-solid fa-arrow-right-from-bracket me-2"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-12 col-md-6 offset-md-3">
+      <!-- Header -->
+      <div class="border-bottom p-3">
+        <h5 class="mb-0 fw-bold">El Presidente <i class="fa-solid fa-circle-check text-primary"></i> </h5>
+        <p class="mb-2"><em>There some bio text about the greatest El Presidente</em></p>
+      </div>
+
+      <!-- Tweet Create Form -->
+      <div class="p-3 border-bottom">
+        <div class="d-flex">
+          <!-- <img src="user.png" height="48" width="48" class="rounded-circle me-2" alt="Profile"> -->
+          <div class="flex-grow-1">
+            <textarea class="form-control tweet-input mb-3" placeholder="What's happening?" rows="3"></textarea>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <!--<i class="far fa-image text-primary me-2"></i>
+                <i class="far fa-chart-bar text-primary me-2"></i>
+                <i class="far fa-smile text-primary me-2"></i>
+                <i class="far fa-calendar text-primary"></i>-->
+              </div>
+              <button class="btn btn-primary rounded-pill px-4">Tweet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tweet Feed -->
+      <div class="tweet p-3 border-bottom">
+        <div class="d-flex">
+          <!-- <img src="user.png" height="48" width="48" class="rounded-circle me-2" alt="Profile"> -->
+          <div>
+            <div class="d-flex align-items-center mb-1">
+              <span class="fw-bold me-2">John Doe</span>
+              <span class="text-muted"> · 2h</span>
+            </div>
+            <p class="mb-2">Just built a Twitter clone using Bootstrap! 🚀 #webdev #coding</p>
+            <div class="tweet-actions d-flex justify-content-between w-75">
+              <div><i class="far fa-thumbs-up"></i> <span class="ms-1">24</span></div>
+              <div><i alt="tweet link" class="far fa-share-square"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tweet p-3 border-bottom">
+        <div class="d-flex">
+          <!-- <img src="user.png" height="48" width="48" class="rounded-circle me-2" alt="Profile"> -->
+          <div>
+            <div class="d-flex align-items-center mb-1">
+              <span class="fw-bold me-2">Maria Taylor</span>
+              <span class="text-muted"> · 5h</span>
+            </div>
+            <p class="mb-2">#travel #fun Barsa was AWESOME! IBIZA meet me NEXT WEEKENDS!</p>
+            <div class="tweet-actions d-flex justify-content-between w-75">
+              <div><i class="far fa-thumbs-up"></i> <span class="ms-1">39</span></div>
+              <div><i alt="tweet link" class="far fa-share-square"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tweet p-3 border-bottom">
+        <div class="d-flex">
+          <!-- <img src="user.png" height="48" width="48" class="rounded-circle me-2" alt="Profile"> -->
+          <div>
+            <div class="d-flex align-items-center mb-1">
+              <span class="fw-bold me-2">Jane Smith</span>
+              <span class="text-muted"> · 4h</span>
+            </div>
+            <p class="mb-2">Learning new things every day! Bootstrap makes frontend development so much easier. 💻 #learning</p>
+            <div class="tweet-actions d-flex justify-content-between w-75">
+              <div><i class="far fa-thumbs-up"></i> <span class="ms-1">54</span></div>
+              <div><i alt="tweet link" class="far fa-share-square"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="tweet p-3 border-bottom">
+        <div class="d-flex">
+          <!-- <img src="user.png" height="48" width="48" class="rounded-circle me-2" alt="Profile"> -->
+          <div>
+            <div class="d-flex align-items-center mb-1">
+              <span class="fw-bold me-2">Jane Smith</span>
+              <span class="text-muted"> · 4h</span>
+            </div>
+            <p class="mb-2">FAST CODE TIPS and TRIX:::)) Bootstrap makes frontend development so much easier. 💻 #learning</p>
+            <div class="tweet-actions d-flex justify-content-between w-75">
+              <div><i class="far fa-thumbs-up"></i> <span class="ms-1">17</span></div>
+              <div><i alt="tweet link" class="far fa-share-square"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar (Desktop only) -->
+    <div class="col-md-3 d-none d-md-block offset-md-9 position-fixed h-100">
+      <div class="p-3">
+        <!-- future widgets -->
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
