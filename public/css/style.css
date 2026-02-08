@@ -23,3 +23,9 @@ span.fw-bold.me-2 > a {
     cursor: not-allowed;
 }
 
+.logolink {text-decoration: unset;}
+
+#edit-profile-btn {
+    display: contents;
+}
+#edit-profile-btn:hover {color: var(--bs-body-color); }
