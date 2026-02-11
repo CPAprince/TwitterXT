@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tweetCreateSection = document.getElementById("tweet-create-section");
 
     if (editBtn && editSection) {
-      editBtn.style.display = "block";
+      editBtn.style.display = "";
       editBtn.addEventListener("click", () => {
         const isHidden =
           editSection.style.display === "none" || window.getComputedStyle(editSection).display === "none";

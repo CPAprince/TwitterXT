@@ -14,18 +14,18 @@
         <textarea
             class="form-control mb-2"
             name="content"
-            rows="3"
+            rows="1"
             maxlength="280"
             data-char-counter
-            placeholder="What's happening?"
+            placeholder="What's new?"
             required
         >{{ initialContent|default('') }}</textarea>
         <div class="d-flex justify-content-end mb-2">
             {% include 'component/_char_counter.html.twig' with { maxlength: 280 } only %}
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex justify-content-end gap-2">
             <button type="submit" class="btn btn-primary btn-sm">
-                {{ (tweetId is defined and tweetId) ? 'Save' : 'Post' }}
+                {{ (tweetId is defined and tweetId) ? 'Save' : 'Tweet' }}
             </button>
             {% if tweetId is defined and tweetId %}
                 <button type="button" class="btn btn-secondary btn-sm tweet-form-cancel">Cancel</button>
