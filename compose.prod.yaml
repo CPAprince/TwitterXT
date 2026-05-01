@@ -6,6 +6,13 @@ services:
     environment:
       APP_SECRET: ${APP_SECRET}
 
+  php-worker:
+    build:
+      context: .
+      target: frankenphp_prod
+
   database:
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    ports:
+#      - "${MYSQL_PORT:-3306}:3306"
