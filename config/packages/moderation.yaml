@@ -1,0 +1,40 @@
+parameters:
+    moderation.enabled: true
+    
+    # live   - live request to OpenAI
+    # demo   - simulate moderation without requests to OpenAI API
+    # bypass - moderation turned off, all approves automatically
+    moderation.mode: '%env(MODERATION_MODE)%'
+    
+    # OpenAI
+    moderation.provider: 'openai'
+    moderation.model: '%env(MODERATION_MODEL)%'
+    moderation.api_key: '%env(OPENAI_API_KEY)%'
+    
+    # batching policy
+    moderation.batch.max_items: 25
+    moderation.batch.soft_token_cap: 1800
+    moderation.batch.hard_token_cap: 2000
+    moderation.batch.flush_interval_ms: 300
+    
+    # runtime rate limits for live moderation
+    # provided limits for Tier1 Account in OpenAI API. 
+    # Free tier has lower limit and Tier2-5 got higher limits. 
+    moderation.limits.rpm: 490
+    moderation.limits.tpm: 9000
+    moderation.limits.rpd: 9800
+    
+    # demo mode settings
+    moderation.demo.approve_percent: '%env(int:MODERATION_DEMO_APPROVE_PERCENT)%'
+    
+    # redis keys / prefixes
+    moderation.redis.queue_key: 'moderation:tweet_queue'
+    moderation.redis.flush_lock_key: 'moderation:flush_lock'
+    moderation.redis.rate_req_prefix: 'moderation:rate:req:'
+    moderation.redis.rate_tok_prefix: 'moderation:rate:tok:'
+    moderation.redis.rate_req_day_prefix: 'moderation:rate:reqday:'
+    
+    # worker behavior
+    moderation.worker.idle_sleep_ms: 300
+    moderation.worker.lock_ttl_seconds: 5
+    moderation.worker.max_fetch_items: 100

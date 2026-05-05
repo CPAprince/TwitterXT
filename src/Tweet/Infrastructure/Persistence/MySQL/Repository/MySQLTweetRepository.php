@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Twitter\Shared\Infrastructure\Persistence\Doctrine\UuidBinaryConverter;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
 use Twitter\Tweet\Domain\Tweet\Exception\UserNotFoundException;
 use Twitter\Tweet\Domain\Tweet\Model\Tweet;
@@ -66,16 +67,24 @@ final readonly class MySQLTweetRepository implements TweetRepository
 
         return $this->entityManager
             ->getRepository(Tweet::class)
-            ->findBy([], ['createdAt' => 'DESC'], $limit, $offset);
+            ->findBy(['moderationStatus' => Tweet::MODERATION_APPROVED], ['createdAt' => 'DESC'], $limit, $offset);
     }
 
     public function getUserTweets(string $userId, int $limit = self::DEFAULT_LIMIT, int $page = 1): array
     {
         [$limit, $offset] = $this->resolvePagination($limit, $page);
-        $binaryUserId = pack('H*', str_replace('-', '', $userId));
+        $binaryUserId = UuidBinaryConverter::toBytes($userId);
 
         return $this->entityManager
             ->getRepository(Tweet::class)
-            ->findBy(['userId' => $binaryUserId], ['createdAt' => 'DESC'], $limit, $offset);
+            ->findBy(
+                [
+                    'userId' => $binaryUserId,
+                    'moderationStatus' => Tweet::MODERATION_APPROVED,
+                ],
+                ['createdAt' => 'DESC'],
+                $limit,
+                $offset
+            );
     }
 }

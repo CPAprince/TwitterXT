@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
 use Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommand;
 use Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetAccessDeniedException;
@@ -23,11 +24,13 @@ final class UpdateTweetCommandHandlerTest extends TestCase
 {
     private UpdateTweetCommandHandler $handler;
     private MockObject|TweetRepository $tweetRepository;
+    private MockObject|ModerationQueueInterface $moderationQueue;
 
     protected function setUp(): void
     {
         $this->tweetRepository = $this->createMock(TweetRepository::class);
-        $this->handler = new UpdateTweetCommandHandler($this->tweetRepository);
+        $this->moderationQueue = $this->createMock(ModerationQueueInterface::class);
+        $this->handler = new UpdateTweetCommandHandler($this->tweetRepository, $this->moderationQueue);
     }
 
     /**

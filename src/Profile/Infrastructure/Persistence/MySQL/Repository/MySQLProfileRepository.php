@@ -15,6 +15,7 @@ use Twitter\Profile\Domain\Profile\Exception\ProfileNotFoundException;
 use Twitter\Profile\Domain\Profile\Exception\UserNotFoundException;
 use Twitter\Profile\Domain\Profile\Model\Profile;
 use Twitter\Profile\Domain\Profile\Model\ProfileRepository;
+use Twitter\Shared\Infrastructure\Persistence\Doctrine\UuidBinaryConverter;
 
 final readonly class MySQLProfileRepository implements ProfileRepository
 {
@@ -59,7 +60,7 @@ final readonly class MySQLProfileRepository implements ProfileRepository
     public function findAllByUserIds(array $userIds): array
     {
         $binaryIds = array_map(
-            static fn (string $uuid) => pack('H*', str_replace('-', '', $uuid)),
+            static fn (string $uuid) => UuidBinaryConverter::toBytes($uuid),
             $userIds
         );
 

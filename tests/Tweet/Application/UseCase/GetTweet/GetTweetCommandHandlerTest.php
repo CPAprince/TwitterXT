@@ -42,6 +42,7 @@ final class GetTweetCommandHandlerTest extends TestCase
         $authorId = '019b5f3f-d110-7908-9177-5df439942a8b';
 
         $tweet = Tweet::create($authorId, 'Hello from unit test!');
+        $tweet->approveModeration();
         $tweetId = $tweet->id();
         $profile = Profile::create($authorId, 'Test User', 'Bio');
 

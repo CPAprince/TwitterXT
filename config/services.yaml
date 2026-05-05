@@ -10,6 +10,14 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        
+    Redis:
+        class: Redis
+        public: true
+        calls:
+            -   connect:
+                    - '%env(REDIS_HOST)%'
+                    - '%env(int:REDIS_PORT)%'
 
     Twitter\Shared\Infrastructure\EventSubscriber\ExceptionSubscriber:
         tags: [ 'kernel.event_subscriber' ]
@@ -224,6 +232,89 @@ services:
         arguments:
             - '@Prometheus\Storage\InMemory'
 
+    Twitter\Tweet\Application\Moderation\:
+        resource: '../src/Tweet/Application/Moderation/'
+        exclude:
+            - '../src/Tweet/Application/Moderation/ModerationConfig.php'
+            - '../src/Tweet/Application/Moderation/ModerationMode.php'
+            - '../src/Tweet/Application/Moderation/ModerationBatch.php'
+            - '../src/Tweet/Application/Moderation/ModerationBatchItem.php'
+            - '../src/Tweet/Application/Moderation/ModerationDecision.php'
+            - '../src/Tweet/Application/Moderation/ModerationRateLimitResult.php'
+            - '../src/Tweet/Application/Moderation/ModerationTweetCandidate.php'
+            - '../src/Tweet/Application/Moderation/TokenBucketDecision.php'
+
+    Twitter\Tweet\Infrastructure\Moderation\:
+        resource: '../src/Tweet/Infrastructure/Moderation/'
+        exclude:
+            - '../src/Tweet/Infrastructure/Moderation/ModerationConfigFactory.php'
+
+    Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory:
+        public: true
+        arguments:
+            $enabled: '%moderation.enabled%'
+            $mode: '%moderation.mode%'
+            $provider: '%moderation.provider%'
+            $model: '%moderation.model%'
+            $apiKey: '%moderation.api_key%'
+
+            $batchMaxItems: '%moderation.batch.max_items%'
+            $batchSoftTokenCap: '%moderation.batch.soft_token_cap%'
+            $batchHardTokenCap: '%moderation.batch.hard_token_cap%'
+            $batchFlushIntervalMs: '%moderation.batch.flush_interval_ms%'
+
+            $limitRpm: '%moderation.limits.rpm%'
+            $limitTpm: '%moderation.limits.tpm%'
+            $limitRpd: '%moderation.limits.rpd%'
+
+            $demoApprovePercent: '%moderation.demo.approve_percent%'
+
+            $redisQueueKey: '%moderation.redis.queue_key%'
+            $redisFlushLockKey: '%moderation.redis.flush_lock_key%'
+            $redisRateReqPrefix: '%moderation.redis.rate_req_prefix%'
+            $redisRateTokPrefix: '%moderation.redis.rate_tok_prefix%'
+            $redisRateReqDayPrefix: '%moderation.redis.rate_req_day_prefix%'
+
+            $workerIdleSleepMs: '%moderation.worker.idle_sleep_ms%'
+            $workerLockTtlSeconds: '%moderation.worker.lock_ttl_seconds%'
+            $workerMaxFetchItems: '%moderation.worker.max_fetch_items%'
+
+    Twitter\Tweet\Application\Moderation\ModerationConfig:
+        public: true
+        factory: [ '@Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory', 'create' ]
+
+    Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface:
+        public: true
+        factory: [ '@Twitter\Tweet\Infrastructure\Moderation\TweetModerationProviderResolver', 'resolve' ]
+
+    Twitter\Tweet\Application\Moderation\ModerationQueueInterface:
+        alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationQueue
+        public: true
+
+    Twitter\Tweet\Application\Moderation\ModerationTweetSourceInterface:
+        alias: Twitter\Tweet\Infrastructure\Moderation\MySqlModerationTweetSource
+        public: true
+
+    Twitter\Tweet\Application\Moderation\ModerationStatusUpdaterInterface:
+        alias: Twitter\Tweet\Infrastructure\Moderation\MySqlModerationStatusUpdater
+        public: true
+
+    Twitter\Tweet\Application\Moderation\ModerationRateLimiterInterface:
+        alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationRateLimiter
+        public: true
+
+    Twitter\Tweet\Application\Moderation\ModerationWorkerLockInterface:
+        alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock
+        public: true
+
+    Twitter\Tweet\UI\CLI\TestModerationProviderCommand:
+        tags: [ 'console.command' ]
+
+    Twitter\Tweet\UI\CLI\ModerationFlushWorkerCommand:
+        tags: [ 'console.command' ]
+        public: true
+
+    
     app.login_rate_limiter:
         class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
         arguments:

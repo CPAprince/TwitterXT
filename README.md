@@ -41,6 +41,17 @@ docker compose exec php php bin/console lexik:jwt:generate-keypair
 
 Open  https://localhost
 
+# Moderation:
+
+Set moderation mode in *.ENV* default is ***demo*** mode where 95% of tweets automatically approve
+
+To get real OpenAI moderation functional set ***
+live*** mode and OPEN_API_KEY
+
+Moderation Worker
+```
+docker compose exec php php bin/console app:moderation:flush-worker
+```
 
 
 *You also can import [Demo Dataset with 555 users, 21k tweets, 79k likes](docs/Dump4tables_for_import_owerwrite_ready.sql)*
