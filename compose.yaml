@@ -155,8 +155,11 @@ services:
     volumes:
       - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./infra/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
 
   grafana:
     image: grafana/grafana:10.3.3
@@ -186,3 +189,4 @@ volumes:
   redis_data:
   rabbitmq_data:
   grafana_data:
+  prometheus_data:

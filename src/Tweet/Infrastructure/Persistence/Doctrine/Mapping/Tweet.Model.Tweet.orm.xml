@@ -7,6 +7,11 @@
     <entity name="Twitter\Tweet\Domain\Tweet\Model\Tweet"
             table="tweets">
 
+        <indexes>
+            <index name="idx_tweets_created_id" columns="created_at,id"/>
+            <index name="idx_tweets_user_created_id" columns="user_id,created_at,id"/>
+        </indexes>
+
         <id name="id" column="id" type="uuid">
             <generator strategy="NONE"/>
         </id>

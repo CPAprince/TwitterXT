@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e?.isValidationError?.()) {
         Alert.appendValidationErrors(alerts, e.errors);
       } else if (e?.status === 401) {
-        Alert.append(alerts, 'Invalid email or password. Please try again.', 'danger');
+        Alert.append(alerts, e?.message || 'Invalid email or password. Please try again.', 'danger');
       } else {
         Alert.append(alerts, e?.message || 'Login failed. Please try again.', 'danger');
       }

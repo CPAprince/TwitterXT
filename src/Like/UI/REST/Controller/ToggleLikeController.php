@@ -12,14 +12,16 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Twitter\IAM\Domain\User\Model\User;
 use Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommand;
-use Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler;
+use Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandlerInterface;
 use Twitter\Like\Domain\Like\Exception\LikeAlreadyExistsException;
+use Twitter\Shared\Infrastructure\RateLimiter\RateLimited;
 
 #[Route('api/tweets/{tweetId}/likes/toggle', name: 'api_tweets_like_toggle', methods: [Request::METHOD_POST])]
+#[RateLimited('like')]
 final class ToggleLikeController extends AbstractController
 {
     public function __construct(
-        private readonly ToggleLikeCommandHandler $handler,
+        private readonly ToggleLikeCommandHandlerInterface $handler,
     ) {}
 
     /**

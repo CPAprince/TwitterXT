@@ -10,7 +10,12 @@ framework:
             limit: '%env(int:RATE_LIMIT_LIKE)%'
             rate: { interval: '2 seconds', amount: 1 }
 
-        login:
-            policy: 'fixed_window'
-            limit: '%env(int:RATE_LIMIT_LOGIN)%'
+        username_ip_login:
+            policy: 'token_bucket'
+            limit: '%env(int:RATE_LIMIT_LOGIN_LOCAL)%'
+            rate: { interval: '5 minutes' }
+
+        ip_login:
+            policy: 'sliding_window'
+            limit: '%env(int:RATE_LIMIT_LOGIN_GLOBAL)%'
             interval: '15 minutes'

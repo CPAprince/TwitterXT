@@ -139,13 +139,13 @@ user from liking the same tweet twice.
 
 ## Indexes
 
-| Table    | Index / Key             | Use Case                                     |
-|:---------|:------------------------|:---------------------------------------------|
-| `users`  | `UNIQUE(email)`         | Fast user lookup during login.               |
-| `tweets` | `IDX(created_at DESC)`  | Chronological Feed generation.               |
-| `tweets` | `IDX(user_id)`          | Fetching all tweets by a specific user.      |
-| `likes`  | `PK(tweet_id, user_id)` | Checking whether a user liked a tweet.       |
-| `likes`  | `IDX(user_id)`          | Fetching a list of tweets liked by the user. |
+| Table    | Index / Key                            | Use Case                                     |
+|:---------|:---------------------------------------|:---------------------------------------------|
+| `users`  | `UNIQUE(email)`                        | Fast user lookup during login.               |
+| `tweets` | `IDX(created_at DESC,id DESC)`         | Chronological Feed generation.               |
+| `tweets` | `IDX(user_id,created_at DESC,id DESC)` | Fetching all tweets by a specific user.      |
+| `likes`  | `PK(tweet_id, user_id)`                | Checking whether a user liked a tweet.       |
+| `likes`  | `IDX(user_id)`                         | Fetching a list of tweets liked by the user. |
 
 ## Normalization
 

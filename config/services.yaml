@@ -4,6 +4,7 @@ parameters:
     cache_ttl_feed_main: '%env(int:CACHE_TTL_FEED_MAIN)%'
     cache_ttl_feed_user: '%env(int:CACHE_TTL_FEED_USER)%'
     cache_ttl_profile: '%env(int:CACHE_TTL_PROFILE)%'
+    like_toggle_lock_ttl_seconds: '%env(int:LIKE_TOGGLE_LOCK_TTL)%'
 
 services:
     _defaults:
@@ -24,6 +25,9 @@ services:
             $environment: '%kernel.environment%'
 
     Twitter\Shared\Infrastructure\EventSubscriber\DoctrineResetSubscriber:
+        tags: [ 'kernel.event_subscriber' ]
+
+    Twitter\Shared\Infrastructure\RateLimiter\RateLimitSubscriber:
         tags: [ 'kernel.event_subscriber' ]
 
     Twitter\Shared\Infrastructure\EventSubscriber\JWTCreatedListener:
@@ -90,6 +94,14 @@ services:
     Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler:
         arguments:
             $likeRepository: '@Twitter\Like\Domain\Like\Model\LikeRepository'
+            
+    Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandlerInterface: '@Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler'
+    
+    Twitter\Like\Infrastructure\Lock\Decorator\ToggleLikeCommandHandlerDecorator:
+        decorates: Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandlerInterface
+        arguments:
+            $inner: '@.inner'
+            $ttlSeconds: '%like_toggle_lock_ttl_seconds%'
     
     Twitter\Profile\Application\UseCase\GetProfile\GetProfileQueryHandler:
         arguments:
@@ -303,6 +315,13 @@ services:
         public: true
 
     
+    app.login_rate_limiter:
+        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
+        arguments:
+            $globalFactory: '@limiter.ip_login'
+            $localFactory: '@limiter.username_ip_login'
+            $secret: '%kernel.secret%'
+
     # DoctrineClearSubscriber commented out: redundant with DoctrineResetSubscriber.
     # In FrankenPHP worker mode, resetManager() already clears the identity map; this subscriber's
     # injected EM reference becomes stale after reset, making it redundant at best.

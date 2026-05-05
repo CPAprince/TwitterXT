@@ -1,22 +1,11 @@
 async function getTweet(tweetId) {
   try {
-    const response = await fetch(`/api/tweets/${tweetId}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
+    const data = await Api.get(`/api/tweets/${tweetId}`);
     console.log('Tweet JSON data:', data);
 
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error fetching tweet:', error);
     return null;
   }
 }
@@ -83,5 +72,6 @@ function showTweet(tweet) {
     }
   });
 
-
+  // Ensure liked state is applied to the newly rendered tweet button
+  window.Tweets?.applyLikedState?.();
 }

@@ -12,10 +12,12 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Twitter\IAM\Domain\User\Model\User;
+use Twitter\Shared\Infrastructure\RateLimiter\RateLimited;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommand;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandlerInterface;
 
 #[Route('/api/tweets', name: 'api_create_tweet', methods: [Request::METHOD_POST])]
+#[RateLimited('tweet_create')]
 final readonly class CreateTweetController
 {
     public function __construct(private CreateTweetCommandHandlerInterface $handler) {}

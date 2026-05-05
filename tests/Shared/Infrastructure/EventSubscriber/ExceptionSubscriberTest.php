@@ -16,6 +16,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Twitter\Shared\Infrastructure\EventSubscriber\ExceptionSubscriber;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
@@ -212,5 +213,34 @@ final class ExceptionSubscriberTest extends TestCase
         $payload = json_decode($response->getContent() ?: '', true);
         self::assertSame('HTTP_ERROR', $payload['error']['code'] ?? null);
         self::assertSame('An error occurred', $payload['error']['message'] ?? null);
+    }
+
+    #[Test]
+    public function onKernelExceptionMapsTooManyRequestsHttpExceptionAndPreservesHeaders(): void
+    {
+        $subscriber = new ExceptionSubscriber($this->logger);
+        $throwable = new TooManyRequestsHttpException(60);
+        $event = new ExceptionEvent(
+            $this->kernel,
+            Request::create('/api/tweets'),
+            HttpKernelInterface::MAIN_REQUEST,
+            $throwable,
+        );
+
+        $this->logger
+            ->expects(self::once())
+            ->method('error');
+
+        $subscriber->onKernelException($event);
+
+        $response = $event->getResponse();
+        self::assertNotNull($response);
+        self::assertSame(429, $response->getStatusCode());
+
+        self::assertSame('60', $response->headers->get('Retry-After'));
+
+        $payload = json_decode($response->getContent() ?: '', true);
+        self::assertSame('TOO_MANY_REQUESTS', $payload['error']['code'] ?? null);
+        self::assertSame('Rate limit exceeded. Please try again later.', $payload['error']['message'] ?? null);
     }
 }

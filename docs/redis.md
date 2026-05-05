@@ -94,12 +94,13 @@ brute-force attacks, and ensures fair usage.
     * **Env Var:** `RATE_LIMIT_LIKE`
 
 3. **Login (Brute-force Protection)**
-    * **Algorithm:** Fixed Window.
-    * **Limit:** 5 attempts / 15 minutes per IP + email.
+    * **Algorithm:** Token Bucket (per user+IP) and Sliding Window (global IP).
+    * **Limit (Local):** 5 attempts / 15 minutes per IP + email.
+    * **Limit (Global):** 50 attempts / 15 minutes per IP.
     * **Justification:**
       [Industry standard](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/03-Testing_for_Weak_Lock_Out_Mechanism)
       strict limit to effectively mitigate credential stuffing and brute-force attacks.
-    * **Env Var:** `RATE_LIMIT_LOGIN`
+    * **Env Vars:** `RATE_LIMIT_LOGIN_LOCAL` and `RATE_LIMIT_LOGIN_GLOBAL`.
 
 ## Lock
 

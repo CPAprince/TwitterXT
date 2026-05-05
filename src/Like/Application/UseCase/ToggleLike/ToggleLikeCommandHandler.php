@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twitter\Like\Application\UseCase\ToggleLike;
 
+use Override;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twitter\Like\Domain\Like\Event\TweetWasLiked;
 use Twitter\Like\Domain\Like\Event\TweetWasUnliked;
@@ -11,7 +12,7 @@ use Twitter\Like\Domain\Like\Exception\LikeAlreadyExistsException;
 use Twitter\Like\Domain\Like\Model\Like;
 use Twitter\Like\Domain\Like\Model\LikeRepository;
 
-final readonly class ToggleLikeCommandHandler
+final readonly class ToggleLikeCommandHandler implements ToggleLikeCommandHandlerInterface
 {
     public function __construct(
         private LikeRepository $likeRepository,
@@ -21,6 +22,7 @@ final readonly class ToggleLikeCommandHandler
     /**
      * @throws LikeAlreadyExistsException
      */
+    #[Override]
     public function handle(ToggleLikeCommand $command): ToggleLikeCommandResult
     {
         $existingLike = $this->likeRepository->findOneByTweetAndUser(

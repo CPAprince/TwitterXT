@@ -32,6 +32,24 @@ const setLikedTweet = (tweetId, liked) => {
 };
 
 window.Tweets = window.Tweets || {};
+window.Tweets._isLikesGloballyDisabled = false;
+window.Tweets._likesRateLimitTimer = null;
+
+window.Tweets.disableAllLikeButtonsFor = (seconds) => {
+  window.Tweets._isLikesGloballyDisabled = true;
+  document.querySelectorAll(".tweet-like-btn").forEach(btn => btn.disabled = true);
+
+  if (window.Tweets._likesRateLimitTimer) {
+    clearTimeout(window.Tweets._likesRateLimitTimer);
+  }
+
+  window.Tweets._likesRateLimitTimer = setTimeout(async () => {
+    window.Tweets._isLikesGloballyDisabled = false;
+    // Re-evaluates guest/auth status to enable appropriately
+    await window.Tweets.applyLikeButtonState();
+  }, seconds * 1000);
+};
+
 window.Tweets.applyEditVisibility = async (container = document) => {
   const currentUserId = await Auth.getCurrentUserId();
   if (!currentUserId) return;
@@ -46,7 +64,19 @@ window.Tweets.applyEditVisibility = async (container = document) => {
 
 window.Tweets.applyLikedState = async (container = document) => {
   const currentUserId = await Auth.getCurrentUserId();
-  if (!currentUserId) return;
+  
+  // If not authenticated, reset all like buttons to unliked state
+  if (!currentUserId) {
+    container.querySelectorAll(".tweet-like-btn").forEach(btn => {
+      btn.dataset.liked = "false";
+      const icon = btn.querySelector(".tweet-like-icon");
+      if (icon) {
+        icon.classList.remove("fas", "text-primary");
+        icon.classList.add("far");
+      }
+    });
+    return;
+  }
 
   const likedTweets = getLikedTweets();
   container.querySelectorAll(".tweet-like-btn").forEach(btn => {
@@ -218,9 +248,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         icon.classList.add("far");
       }
 
+      if (error?.status === 429 && error?.retryAfter) {
+        window.Tweets.disableAllLikeButtonsFor(error.retryAfter);
+      }
       console.error("Failed to toggle like:", error);
     } finally {
-      likeBtn.disabled = false;
+      // Only re-enable if we are NOT in a global rate limit lockout
+      if (!window.Tweets._isLikesGloballyDisabled) {
+        likeBtn.disabled = false;
+      }
     }
   });
 
@@ -323,6 +359,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (alerts) {
           alerts.replaceChildren();
           Alert.append(alerts, normalizeError(error), "danger");
+        }
+
+        if (error?.status === 429 && error?.retryAfter) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            // Use setTimeout to run after the `finally` block runs Loading.enableForm
+            setTimeout(() => {
+              submitBtn.disabled = true;
+              const originalText = submitBtn.textContent;
+              let timeLeft = error.retryAfter;
+
+              submitBtn.textContent = `Try in ${timeLeft}s`;
+              const interval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                  clearInterval(interval);
+                  submitBtn.disabled = false;
+                  submitBtn.textContent = originalText;
+                  if (alerts) {
+                    alerts.replaceChildren();
+                  }
+                } else {
+                  submitBtn.textContent = `Try in ${timeLeft}s`;
+                }
+              }, 1000);
+            }, 0);
+          }
         }
       } finally {
         Loading.enableForm(form);

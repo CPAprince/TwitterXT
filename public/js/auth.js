@@ -132,6 +132,7 @@ if (window.Api && window.Auth) {
     originalSetToken(token);
     window.Auth.updateNavVisibility();
     window.Tweets?.applyLikeButtonState?.();
+    window.Tweets?.applyLikedState?.();
   };
 
   const originalClearToken = Api.clearToken.bind(Api);
@@ -139,6 +140,7 @@ if (window.Api && window.Auth) {
     originalClearToken();
     window.Auth.updateNavVisibility();
     window.Tweets?.applyLikeButtonState?.();
+    window.Tweets?.applyLikedState?.();
   };
 }
 

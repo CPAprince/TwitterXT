@@ -1,10 +1,11 @@
 class ApiError extends Error {
-  constructor(message, { code = null, errors = null, status = 0 } = {}) {
+  constructor(message, { code = null, errors = null, status = 0, retryAfter = null } = {}) {
     super(message);
     this.name = 'ApiError';
     this.code = code;
     this.errors = errors;
     this.status = status;
+    this.retryAfter = retryAfter ? parseInt(retryAfter, 10) : null;
   }
 
   isValidationError() {
@@ -417,7 +418,8 @@ window.Api = {
         {
           code: data?.error?.code ?? null,
           errors: data?.errors ?? null,
-          status: response.status
+          status: response.status,
+          retryAfter: response.headers.get('Retry-After')
         }
       );
     }
@@ -445,7 +447,8 @@ window.Api = {
         {
           code: data?.error?.code ?? null,
           errors: data?.errors ?? null,
-          status: response.status
+          status: response.status,
+          retryAfter: response.headers.get('Retry-After')
         }
       );
     }
@@ -478,7 +481,8 @@ window.Api = {
         {
           code: data?.error?.code ?? null,
           errors: data?.errors ?? null,
-          status: response.status
+          status: response.status,
+          retryAfter: response.headers.get('Retry-After')
         }
       );
     }

@@ -13,3 +13,6 @@ framework:
             cache.profiles:
                 adapter: cache.adapter.redis_tag_aware
                 tags: true
+
+            cache.rate_limiter:
+                adapter: cache.adapter.redis
