@@ -31,7 +31,7 @@ jobs:
           source: .
           files: |
             compose.yaml
-            compose.override.yaml
+            compose.dev.yaml
           set: |
             php.cache-from=type=gha,scope=php-${{ github.ref }}
             php.cache-from=type=gha,scope=php-refs/heads/main

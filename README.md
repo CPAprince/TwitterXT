@@ -21,6 +21,11 @@ docker compose build --pull --no-cache
 docker compose up --wait
 ```
 
+Use to start after change APP_ENV = dev|prod in .env
+```sh
+docker compose up -d --build --wait
+```
+
 Assuming that you already have [Composer](http://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos)
 installed globally, install required dependencies
 
