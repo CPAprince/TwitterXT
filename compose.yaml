@@ -12,10 +12,10 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-dev}
       APP_DEBUG: ${APP_DEBUG:-1}
-      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      SERVER_NAME: ${SERVER_NAME:-localhost, 127.0.0.1}, php:80
       DEFAULT_URI: https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
-      TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^${SERVER_NAME:-example\.com|localhost}|php$$}
+      TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^(${SERVER_NAME:-example\.com|localhost|127\.0\.0\.1}|php)$$}
       DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=${MYSQL_VERSION:-8}&charset=${MYSQL_CHARSET:-utf8mb4}
       MERCURE_URL: ${MERCURE_URL:-http://mercure/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL:-/.well-known/mercure}
@@ -26,9 +26,9 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-      - "${HTTP3_PORT:-443}:443/udp"
+      - "127.0.0.1:${HTTP_PORT:-80}:80"
+      - "127.0.0.1:${HTTPS_PORT:-443}:443"
+      # - "${HTTP3_PORT:-443}:443/udp"
     healthcheck:
       test: curl --insecure --fail https://localhost/api/health || exit 1
       timeout: 5s
@@ -105,7 +105,7 @@ services:
         anonymous
         cors_origins *
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/healthz" ]
+      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:2019/mercure/health/ready" ]
       timeout: 5s
       retries: 5
       start_period: 60s
