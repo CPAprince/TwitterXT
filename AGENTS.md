@@ -24,3 +24,11 @@
 
 ### 3. Production Release Rule
 - Changes reach `main` strictly via a Pull Request from `develop` -> `main`.
+
+## Language & Documentation Standards
+
+### 1. English Only for Repository Content
+- **Documentation**: All documentation files (`.md`, guides, architectural documents, technical specs) committed to the repository MUST be written in **English**.
+- **Code Comments**: All code comments, PHPDoc / docblocks, variable names, and commit messages MUST be written in **English**.
+- **User Communication**: In-chat communication with the developer can remain in Russian/Ukrainian as preferred by the user, but any file written to disk or Git history MUST be in English.
+
