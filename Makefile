@@ -28,14 +28,24 @@ about:
 container:
 	docker compose exec php php bin/console debug:container
 
-start:
-	docker compose up --wait -d
+start: startdev
+
+startb: startdev-b
+
+startdev:
+	docker compose -f compose.yaml -f compose.dev.yaml up -d --wait
+
+startdev-b:
+	docker compose -f compose.yaml -f compose.dev.yaml up -d --build --wait
+
+startprod:
+	docker compose -f compose.yaml -f compose.prod.yaml up -d --wait
+
+startprod-b:
+	docker compose -f compose.yaml -f compose.prod.yaml up -d --build --wait
 
 stop:
 	docker compose down
-
-startb:
-	docker compose up -d --build --wait
 
 worker:
 	docker compose exec php php bin/console app:moderation:flush-worker
