@@ -1,5 +1,6 @@
 /.idea/
 /.vscode/
+/.claude/
 
 /docker/db/data
 bolt.db

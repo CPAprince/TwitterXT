@@ -34,6 +34,9 @@ start:
 stop:
 	docker compose down
 
+startb:
+	docker compose up -d --build --wait
+
 worker:
 	docker compose exec php php bin/console app:moderation:flush-worker
 
