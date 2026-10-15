@@ -14,16 +14,24 @@ use Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface;
 
 final class OpenAiTweetModerationProvider implements TweetModerationProviderInterface
 {
-    private ClientContract $client;
-
     public function __construct(
         private readonly ModerationConfig $config,
-    ) {
+        private ?ClientContract $client = null,
+    ) {}
+
+    private function getClient(): ClientContract
+    {
+        if (null !== $this->client) {
+            return $this->client;
+        }
+
         if (!$this->config->hasApiKey()) {
             throw new RuntimeException('OPENAI_API_KEY is not configured.');
         }
 
         $this->client = OpenAI::client($this->config->apiKey);
+
+        return $this->client;
     }
 
     public function moderateBatch(array $items): array
@@ -37,7 +45,9 @@ final class OpenAiTweetModerationProvider implements TweetModerationProviderInte
             $items
         );
 
-        $response = $this->client->moderations()->create([
+        $client = $this->getClient();
+
+        $response = $client->moderations()->create([
             'model' => $this->config->model,
             'input' => $inputs,
         ]);

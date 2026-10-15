@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
 use RuntimeException;
 use Twitter\Tweet\Application\Moderation\ModerationBatchItem;
 use Twitter\Tweet\Application\Moderation\ModerationConfig;
@@ -21,17 +20,28 @@ use Twitter\Tweet\Infrastructure\Moderation\OpenAiTweetModerationProvider;
 #[CoversClass(OpenAiTweetModerationProvider::class)]
 final class OpenAiTweetModerationProviderTest extends TestCase
 {
-    // ── constructor ───────────────────────────────────────────────────────────
+    // ── constructor / lazy init ───────────────────────────────────────────────
 
     #[Test]
-    public function throwsRuntimeExceptionWhenApiKeyIsNotConfigured(): void
+    public function canBeInstantiatedWithoutApiKey(): void
     {
         $config = $this->makeConfig(apiKey: null);
+        $provider = new OpenAiTweetModerationProvider($config);
+
+        self::assertInstanceOf(OpenAiTweetModerationProvider::class, $provider);
+    }
+
+    #[Test]
+    public function throwsRuntimeExceptionWhenModerateBatchCalledWithoutApiKey(): void
+    {
+        $config = $this->makeConfig(apiKey: null);
+        $provider = new OpenAiTweetModerationProvider($config);
+        $items = [new ModerationBatchItem('tweet-1', 'Hello world', 3, 1)];
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/OPENAI_API_KEY is not configured/');
 
-        new OpenAiTweetModerationProvider($config);
+        $provider->moderateBatch($items);
     }
 
     // ── moderateBatch ─────────────────────────────────────────────────────────
@@ -148,14 +158,7 @@ final class OpenAiTweetModerationProviderTest extends TestCase
         // ClientFake implements ClientContract and queues pre-built responses
         $clientFake = new ClientFake([$response]);
 
-        // Construct with a real (fake) API key so the constructor guard passes
-        $provider = new OpenAiTweetModerationProvider($this->makeConfig(apiKey: 'sk-fake-key'));
-
-        // Inject via reflection — property type is ClientContract, ClientFake satisfies it
-        (new ReflectionProperty(OpenAiTweetModerationProvider::class, 'client'))
-            ->setValue($provider, $clientFake);
-
-        return $provider;
+        return new OpenAiTweetModerationProvider($this->makeConfig(apiKey: null), $clientFake);
     }
 
     private function makeConfig(?string $apiKey = 'sk-test'): ModerationConfig
