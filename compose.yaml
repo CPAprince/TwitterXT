@@ -95,7 +95,7 @@ services:
   
   ###> symfony/mercure-bundle ###
   mercure:
-    image: dunglas/mercure:latest
+    image: dunglas/mercure:v0.21
     restart: unless-stopped
     environment:
       SERVER_NAME: ':80'
@@ -105,7 +105,7 @@ services:
         anonymous
         cors_origins *
     healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider", "http://127.0.0.1:2019/mercure/health/ready" ]
+      test: [ "CMD", "curl", "-f", "http://localhost/healthz" ]
       timeout: 5s
       retries: 5
       start_period: 60s
