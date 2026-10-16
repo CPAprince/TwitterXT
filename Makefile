@@ -30,18 +30,10 @@ container:
 
 start: startdev
 
-startb: startdev-b
-
 startdev:
-	docker compose -f compose.yaml -f compose.dev.yaml up -d --wait
-
-startdev-b:
 	docker compose -f compose.yaml -f compose.dev.yaml up -d --build --wait
 
 startprod:
-	docker compose -f compose.yaml -f compose.prod.yaml up -d --wait
-
-startprod-b:
 	docker compose -f compose.yaml -f compose.prod.yaml up -d --build --wait
 
 stop:
