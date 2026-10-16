@@ -49,11 +49,11 @@ export const options = {
   insecureSkipTLSVerify: true,
 
   stages: [
-    { duration: '10s', target: 5 },
-    { duration: '1m', target: 5 },
-    { duration: '3m', target: 5 },
-    { duration: '3m', target: 5 },
-    { duration: '1m', target: 5 },
+    { duration: '10s', target: 8 },
+    { duration: '1m', target: 8 },
+    { duration: '3m', target: 8 },
+    { duration: '3m', target: 8 },
+    { duration: '1m', target: 8 },
   ],
 
   thresholds: {
