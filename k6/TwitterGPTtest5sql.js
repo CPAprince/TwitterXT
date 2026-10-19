@@ -22,7 +22,7 @@ const db = sql.open(driver, `${MySQL_USER}:${MySQL_PASSWORD}@tcp(${MySQL_IP}:${M
 const BASE_URL = 'https://localhost';
 
 const userLoginShare = 100; // % users that login
-const maxFeedPages = 7;    // max view depth viewing main feed
+const maxFeedPages = parseInt(__ENV.FEED_PAGES || '15', 10);    // max view depth viewing main feed
 const scrollProbability = 0.9; // scroll posibility
 
 const FEED_LIMIT = 50;

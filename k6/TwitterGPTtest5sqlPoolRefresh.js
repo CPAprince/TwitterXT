@@ -22,7 +22,7 @@ const MySQL_PORT = __ENV.MYSQL_PORT || '3306';
 const MySQL_DATABASE = __ENV.MYSQL_DATABASE || 'app';
 
 const userLoginShare = parseInt(__ENV.USER_LOGIN_SHARE || '100', 10); // % iterations that use auth
-const maxFeedPages = parseInt(__ENV.FEED_PAGES || '7', 10);          // Max feed scroll depth
+const maxFeedPages = parseInt(__ENV.FEED_PAGES || '15', 10);          // Max feed scroll depth
 const scrollProbability = parseFloat(__ENV.SCROLL_PROB || '0.9');    // Probability of scrolling to next page
 const FEED_LIMIT = parseInt(__ENV.FEED_LIMIT || '50', 10);
 
