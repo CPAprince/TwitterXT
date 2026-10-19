@@ -10,7 +10,7 @@ import driver from 'k6/x/sql/driver/mysql';
    ========================================================================= */
 
 const BASE_URL = __ENV.BASE_URL || 'https://localhost';
-const TARGET_USERS = parseInt(__ENV.TARGET_USERS || '5000', 10);
+const TARGET_USERS = parseInt(__ENV.TARGET_USERS || '20000', 10);
 
 const MySQL_USER = __ENV.MYSQL_USER || 'app';
 const MySQL_PASSWORD = __ENV.MYSQL_PASSWORD || '!ChangeMe!';
