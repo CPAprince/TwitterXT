@@ -330,7 +330,7 @@ export function setup() {
   // 5. Pre-load realistic tweet content for posting (UTF-8 decoded)
   console.log(`\x1b[34m[SETUP]\x1b[0m Loading realistic tweet content for posting...`);
   const tweetContentRows = db.query(
-    "SELECT DISTINCT content FROM app.tweets WHERE created_at <= '2026-01-25' ORDER BY RAND() LIMIT 30000;"
+    "SELECT DISTINCT content FROM app.tweets WHERE created_at <= '2026-02-25' ORDER BY RAND() LIMIT 30000;"
   );
   const tweets4postingAvailable = [];
   for (const row of tweetContentRows) {
