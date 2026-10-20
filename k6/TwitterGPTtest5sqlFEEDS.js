@@ -10,24 +10,25 @@ import driver from "k6/x/sql/driver/mysql";
 
 // The second argument is a MySQL connection string, e.g.
 // myuser:mypass@tcp(127.0.0.1:3306)/mydb
-const MySQL_USER = "app";
-const MySQL_PASSWORD = "!ChangeMe!";
-const MySQL_IP = "127.0.0.1";
-const MySQL_PORT = "3306";
-const MySQL_DATABASE = "app";
+const MySQL_USER = __ENV.MYSQL_USER || "app";
+const MySQL_PASSWORD = __ENV.MYSQL_PASSWORD || "!ChangeMe!";
+const MySQL_IP = __ENV.MYSQL_IP || "127.0.0.1";
+const MySQL_PORT = __ENV.MYSQL_PORT || "3306";
+const MySQL_DATABASE = __ENV.MYSQL_DATABASE || "app";
 
 
 const db = sql.open(driver, `${MySQL_USER}:${MySQL_PASSWORD}@tcp(${MySQL_IP}:${MySQL_PORT})/${MySQL_DATABASE}`);
 
-const BASE_URL = 'https://localhost';
+const BASE_URL = __ENV.BASE_URL || 'https://localhost';
+const USER_PASSWORD = __ENV.USER_PASSWORD || 'Pa$$word1';
 
-const userLoginShare = 100; // % users that login
+const userLoginShare = parseInt(__ENV.USER_LOGIN_SHARE || '100', 10); // % users that login
 const maxFeedPages = parseInt(__ENV.FEED_PAGES || '15', 10);    // max view depth viewing main feed
-const scrollProbability = 0.9; // scroll posibility
+const scrollProbability = parseFloat(__ENV.SCROLL_PROB || '0.9'); // scroll posibility
 
-const FEED_LIMIT = 50;
-const THINK_TIME_MIN = 0; // seconds
-const THINK_TIME_MAX = 0; // seconds
+const FEED_LIMIT = parseInt(__ENV.FEED_LIMIT || '50', 10);
+const THINK_TIME_MIN = parseFloat(__ENV.THINK_TIME_MIN || '0'); // seconds
+const THINK_TIME_MAX = parseFloat(__ENV.THINK_TIME_MAX || '0'); // seconds
 
 /* =========================
    📊 K6 OPTIONS
@@ -155,7 +156,7 @@ function shouldLogin() {
 function login() {
   const payload = JSON.stringify({
     email: randomItem(emailsAvailable),
-    password: 'Pa$$word1',
+    password: USER_PASSWORD,
   });
 
   const params = {

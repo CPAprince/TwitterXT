@@ -9,6 +9,7 @@ import driver from 'k6/x/sql/driver/mysql';
    ========================================================================= */
 
 const BASE_URL = __ENV.BASE_URL || 'https://localhost';
+const USER_PASSWORD = __ENV.USER_PASSWORD || 'Pa$$word1';
 
 // Minimum required logged-in users.
 // If DB contains >= MIN_LOGGED_IN_USERS with active refresh tokens, ALL of them will be used.
@@ -47,6 +48,7 @@ const endpoints = [
 
 export const options = {
   insecureSkipTLSVerify: true,
+  setupTimeout: '15m',
 
   stages: [
     { duration: '10s', target: 8 },
@@ -108,7 +110,7 @@ function shouldLogin() {
 function executeLogin(email) {
   const payload = JSON.stringify({
     email: email,
-    password: 'Pa$$word1',
+    password: USER_PASSWORD,
   });
 
   const params = {

@@ -10,6 +10,7 @@ import driver from 'k6/x/sql/driver/mysql';
    ========================================================================= */
 
 const BASE_URL = __ENV.BASE_URL || 'https://localhost';
+const USER_PASSWORD = __ENV.USER_PASSWORD || 'Pa$$word1';
 const TARGET_USERS = parseInt(__ENV.TARGET_USERS || '20000', 10);
 
 const MySQL_USER = __ENV.MYSQL_USER || 'app';
@@ -126,7 +127,7 @@ export default function (data) {
 
   const payload = JSON.stringify({
     email: email,
-    password: 'Pa$$word1',
+    password: USER_PASSWORD,
   });
 
   const params = {
