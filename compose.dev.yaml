@@ -21,7 +21,7 @@ services:
 
   database:
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
 
   php-worker:
     build:
