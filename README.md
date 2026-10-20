@@ -2,7 +2,8 @@
 
 This project is a Twitter-like application developed for EPAM Campus.
 
-All detailed documentation → [/docs](docs)
+All detailed documentation → [/docs](docs)  
+Load testing guide & scenarios → [/k6/k6.md](k6/k6.md)
 
 ## Quick start
 
@@ -14,16 +15,37 @@ git checkout develop
 git pull
 ```
 
-Build application image and launch Docker containers
+Build application image and launch Docker containers (Development mode)
 
 ```sh
-docker compose build --pull --no-cache
-docker compose up --wait
+make startdev
+# or simply: make start
 ```
 
-Use to start after change APP_ENV = dev|prod in .env
+To stop containers at any time:
 ```sh
-docker compose up -d --build --wait
+make stop
+```
+
+### Environments & k6 Load Testing
+
+Switching between Development and Production environments is managed via `Makefile`:
+
+#### Run in Production Mode for k6 Load Testing:
+Runs FrankenPHP in optimized production mode (`APP_ENV=prod`, `APP_DEBUG=0`, OPcache enabled, 5 persistent workers, Symfony WebProfiler disabled):
+```sh
+# Stop running dev containers:
+make stop
+
+# Build and start production stack:
+make startprod
+
+# Execute k6 load test scenario (see k6/k6.md for details):
+k6 run k6/TwitterGPTtest5sql.js
+
+# Return to development mode after testing:
+make stop
+make startdev
 ```
 
 Assuming that you already have [Composer](http://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos)

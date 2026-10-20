@@ -1,0 +1,782 @@
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sql.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0031] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sql.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 5 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0002] #TEST DATA#  Emails: 10000 | ProfilesWithTweets: 10000 | TweetsToLike: 10000    source=console
+WARN[0450] The test has generated metrics with 100024 unique time series, which is higher than the suggested limit of 100000 and could cause high memory usage. Consider not using high-cardinality values like unique IDs as metric tags or, if you need them in the URL, use the name metric tag or URL grouping. See https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/ for details.  component=metrics-engine-ingester
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page>=4)
+
+     █ POST /api/token (login)
+
+       ✓ login status is 200
+       ✓ JWT received
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes
+
+     checks............................: 100.00% ✓ 6194       ✗ 0
+     data_received.....................: 615 MB  1.2 MB/s
+     data_sent.........................: 6.4 MB  13 kB/s
+     group_duration....................: avg=47.55ms  min=522.1µs  med=4.19ms   max=1.38s    p(90)=11.95ms  p(95)=664.48ms
+     http_req_blocked..................: avg=668ns    min=0s       med=0s       max=7.56ms   p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=62ns     min=0s       med=0s       max=1.07ms   p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=47.45ms  min=522.1µs  med=3.95ms   max=1.38s    p(90)=11.84ms  p(95)=664.2ms
+     ✓ { endpoint:Like }...............: avg=13.18ms  min=1.61ms   med=11.98ms  max=102.52ms p(90)=17.86ms  p(95)=20.8ms
+     ✓ { endpoint:Login }..............: avg=705.93ms min=561.48ms med=693.79ms max=1.38s    p(90)=769.14ms p(95)=799.95ms
+     ✓ { endpoint:ProfileFeed }........: avg=6.47ms   min=2.09ms   med=5.97ms   max=108.64ms p(90)=9.3ms    p(95)=10.83ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=4.7ms    min=1.04ms   med=4.26ms   max=108.67ms p(90)=6.52ms   p(95)=7.6ms
+     ✓ { endpoint:tweets_page1 }.......: avg=4.28ms   min=1.5ms    med=3.87ms   max=105.47ms p(90)=6.28ms   p(95)=7.24ms
+     ✓ { endpoint:tweets_page2 }.......: avg=3.78ms   min=1.06ms   med=3.39ms   max=106.11ms p(90)=5.45ms   p(95)=6.5ms
+     ✓ { endpoint:tweets_page3 }.......: avg=3.67ms   min=1.03ms   med=3.28ms   max=36.84ms  p(90)=5.39ms   p(95)=6.38ms
+     ✓ { endpoint:tweets_page4plus }...: avg=3.63ms   min=522.1µs  med=3.25ms   max=106.48ms p(90)=5.32ms   p(95)=6.34ms
+       { expected_response:true }......: avg=47.45ms  min=522.1µs  med=3.95ms   max=1.38s    p(90)=11.84ms  p(95)=664.2ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 50977
+     http_req_receiving................: avg=488µs    min=0s       med=528.59µs max=23.79ms  p(90)=1.08ms   p(95)=1.2ms
+     http_req_sending..................: avg=120.32µs min=0s       med=0s       max=3.9ms    p(90)=539.4µs  p(95)=554.1µs
+     http_req_tls_handshaking..........: avg=392ns    min=0s       med=0s       max=7.56ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=46.84ms  min=504.4µs  med=3.29ms   max=1.38s    p(90)=11.41ms  p(95)=663.91ms
+     http_reqs.........................: 50977   103.642248/s
+     ✓ { endpoint:Like }...............: 3057    6.215241/s
+     ✓ { endpoint:Login }..............: 3097    6.296566/s
+     ✓ { endpoint:ProfileFeed }........: 6233    12.672423/s
+     ✓ { endpoint:ProfileNameBio }.....: 6233    12.672423/s
+     ✓ { endpoint:tweets_page1 }.......: 6194    12.593132/s
+     ✓ { endpoint:tweets_page2 }.......: 5570    11.324466/s
+     ✓ { endpoint:tweets_page3 }.......: 5009    10.183887/s
+     ✓ { endpoint:tweets_page4plus }...: 15584   31.684108/s
+     iteration_duration................: avg=783.54ms min=624.9ms  med=769.8ms  max=1.53s    p(90)=861.76ms p(95)=895.98ms
+     iterations........................: 3097    6.296566/s
+     vus...............................: 0       min=0        max=5
+                                                                                                                                                                                                                
+running (8m11.9s), 0/5 VUs, 3097 complete and 0 interrupted iterations                                                                                                                                          
+default ✓ [======================================] 0/5 VUs  8m10s                                                                                                                                               
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sql.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0001] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sql.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 5 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0002] #TEST DATA#  Emails: 10000 | ProfilesWithTweets: 10000 | TweetsToLike: 10000    source=console
+WARN[0445] The test has generated metrics with 100042 unique time series, which is higher than the suggested limit of 100000 and could cause high memory usage. Consider not using high-cardinality values like unique IDs as metric tags or, if you need them in the URL, use the name metric tag or URL grouping. See https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/ for details.  component=metrics-engine-ingester
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page>=4)
+
+     █ POST /api/token (login)
+
+       ✓ login status is 200
+       ✓ JWT received
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes
+
+     checks............................: 100.00% ✓ 6244       ✗ 0
+     data_received.....................: 613 MB  1.2 MB/s
+     data_sent.........................: 6.4 MB  13 kB/s
+     group_duration....................: avg=47.6ms   min=0s       med=3.98ms   max=1.31s    p(90)=11.6ms   p(95)=662.79ms
+     http_req_blocked..................: avg=599ns    min=0s       med=0s       max=6.53ms   p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=51ns     min=0s       med=0s       max=906µs    p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=47.5ms   min=0s       med=3.85ms   max=1.31s    p(90)=11.5ms   p(95)=662.68ms
+     ✓ { endpoint:Like }...............: avg=12.94ms  min=1.54ms   med=11.7ms   max=89.51ms  p(90)=17.39ms  p(95)=20.15ms
+     ✓ { endpoint:Login }..............: avg=702.62ms min=569.17ms med=695.39ms max=1.31s    p(90)=764.44ms p(95)=783.19ms
+     ✓ { endpoint:ProfileFeed }........: avg=6.42ms   min=504.49µs med=5.89ms   max=112.34ms p(90)=8.99ms   p(95)=10.39ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=4.19ms   min=529.8µs  med=3.74ms   max=107.01ms p(90)=5.82ms   p(95)=6.7ms
+     ✓ { endpoint:tweets_page1 }.......: avg=4.21ms   min=0s       med=3.92ms   max=104.35ms p(90)=6.11ms   p(95)=7.01ms
+     ✓ { endpoint:tweets_page2 }.......: avg=3.72ms   min=523.29µs med=3.39ms   max=30.58ms  p(90)=5.37ms   p(95)=6.34ms
+     ✓ { endpoint:tweets_page3 }.......: avg=3.63ms   min=1.03ms   med=3.26ms   max=103.48ms p(90)=5.3ms    p(95)=6.11ms
+     ✓ { endpoint:tweets_page4plus }...: avg=3.55ms   min=510.9µs  med=3.22ms   max=104.31ms p(90)=5.25ms   p(95)=6.04ms
+       { expected_response:true }......: avg=47.5ms   min=0s       med=3.85ms   max=1.31s    p(90)=11.5ms   p(95)=662.68ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 50938
+     http_req_receiving................: avg=482.49µs min=0s       med=524.7µs  max=26.55ms  p(90)=1.06ms   p(95)=1.2ms
+     http_req_sending..................: avg=119.97µs min=0s       med=0s       max=10.77ms  p(90)=535.2µs  p(95)=549.6µs
+     http_req_tls_handshaking..........: avg=282ns    min=0s       med=0s       max=4.37ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=46.9ms   min=0s       med=3.23ms   max=1.31s    p(90)=11.11ms  p(95)=662.39ms
+     http_reqs.........................: 50938   103.636329/s
+     ✓ { endpoint:Like }...............: 3084    6.274578/s
+     ✓ { endpoint:Login }..............: 3122    6.351891/s
+     ✓ { endpoint:ProfileFeed }........: 6230    12.675298/s
+     ✓ { endpoint:ProfileNameBio }.....: 6230    12.675298/s
+     ✓ { endpoint:tweets_page1 }.......: 6244    12.703782/s
+     ✓ { endpoint:tweets_page2 }.......: 5582    11.356904/s
+     ✓ { endpoint:tweets_page3 }.......: 5054    10.282657/s
+     ✓ { endpoint:tweets_page4plus }...: 15392   31.315921/s
+     iteration_duration................: avg=777.6ms  min=642.49ms med=768.3ms  max=1.42s    p(90)=852.1ms  p(95)=882.08ms
+     iterations........................: 3122    6.351891/s
+     vus...............................: 2       min=0        max=5
+                                                                                                                                                                                                                
+running (8m11.5s), 0/5 VUs, 3122 complete and 0 interrupted iterations                                                                                                                                          
+default ✓ [======================================] 0/5 VUs  8m10s                                                                                                                                               
+PS C:\EPAM\TwitterXT\TwitterXT> make about
+docker compose exec php php bin/console about
+ -------------------- --------------------------------- 
+  Symfony
+ -------------------- ---------------------------------
+  Version              7.4.7
+  Long-Term Support    Yes
+  End of maintenance   11/2028 (in +776 days)
+  End of life          11/2029 (in +1141 days)
+ -------------------- ---------------------------------
+  Kernel
+ -------------------- ---------------------------------
+  Type                 Twitter\Kernel
+  Environment          prod
+  Debug                false
+  Charset              UTF-8
+  Cache directory      ./var/cache/prod (4.5 MiB)
+  Build directory      ./var/cache/prod (4.5 MiB)
+  Share directory      ./var/share/prod (n/a)
+  Log directory        ./var/log (0 B)
+ -------------------- ---------------------------------
+  PHP
+ -------------------- ---------------------------------
+  Version              8.4.26
+  Architecture         64 bits
+  Intl locale          en_US_POSIX
+  Timezone             UTC (2026-10-16T09:59:40+00:00)
+  OPcache              Enabled
+  APCu                 Enabled
+  Xdebug               Not installed
+ -------------------- ---------------------------------
+
+PS C:\EPAM\TwitterXT\TwitterXT> MIN_LOGGED_IN_USERS=1000 k6 run k6/TwitterGPTtest5sqlPoolRefresh.js
+MIN_LOGGED_IN_USERS=1000 : The term 'MIN_LOGGED_IN_USERS=1000' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was 
+included, verify that the path is correct and try again.
+At line:1 char:1
++ MIN_LOGGED_IN_USERS=1000 k6 run k6/TwitterGPTtest5sqlPoolRefresh.js
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (MIN_LOGGED_IN_USERS=1000:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPoolRefresh.js                         
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0000] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPoolRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 5 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0000] [SETUP] Found 4621 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0000] [SETUP] Pool already satisfies minimum required size. Using all 4621 active user sessions!  source=console                                                                                           
+INFO[0000] [SETUP] Loading profile UUIDs...     source=console                                                                                                                                                  
+INFO[0001] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0001] #SETUP COMPLETE# Logged-in Pool: 4621 | Profiles: 10000 | Tweets: 10000  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     checks............................: 100.00% ✓ 28890      ✗ 0
+     data_received.....................: 4.5 GB  9.1 MB/s
+     data_sent.........................: 46 MB   94 kB/s
+     group_duration....................: avg=6.51ms   min=0s       med=5.38ms   max=144.59ms p(90)=10.09ms  p(95)=15.77ms
+     http_req_blocked..................: avg=351ns    min=0s       med=0s       max=4.3ms    p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=4ns      min=0s       med=0s       max=644.8µs  p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=6.51ms   min=0s       med=5.38ms   max=144.59ms p(90)=10.33ms  p(95)=15.55ms
+     ✓ { endpoint:Like }...............: avg=18.35ms  min=3.18ms   med=17.16ms  max=144.59ms p(90)=23.29ms  p(95)=27.12ms
+     ✓ { endpoint:Login }..............: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=6.91ms   min=547.4µs  med=5.99ms   max=115.13ms p(90)=10.31ms  p(95)=12.04ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=5.65ms   min=533.4µs  med=5ms      max=111.6ms  p(90)=7.65ms   p(95)=8.8ms
+     ✓ { endpoint:TokenRefresh }.......: avg=8.99ms   min=2.18ms   med=8.37ms   max=49.19ms  p(90)=12.02ms  p(95)=13.61ms
+     ✓ { endpoint:tweets_page1 }.......: avg=5.38ms   min=0s       med=4.97ms   max=106.57ms p(90)=7.67ms   p(95)=8.79ms
+     ✓ { endpoint:tweets_page2 }.......: avg=5.3ms    min=509.8µs  med=4.92ms   max=106.05ms p(90)=7.6ms    p(95)=8.71ms
+     ✓ { endpoint:tweets_page3 }.......: avg=5.32ms   min=507.7µs  med=4.93ms   max=108.02ms p(90)=7.6ms    p(95)=8.69ms
+     ✓ { endpoint:tweets_page4plus }...: avg=5.27ms   min=509.29µs med=4.92ms   max=109.13ms p(90)=7.55ms   p(95)=8.64ms
+       { expected_response:true }......: avg=6.51ms   min=0s       med=5.38ms   max=144.59ms p(90)=10.33ms  p(95)=15.55ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 363924
+     http_req_receiving................: avg=732.7µs  min=0s       med=548.9µs  max=19.12ms  p(90)=1.63ms   p(95)=2.14ms
+     http_req_sending..................: avg=138.89µs min=0s       med=0s       max=5.21ms   p(90)=549.9µs  p(95)=567.1µs
+     http_req_tls_handshaking..........: avg=38ns     min=0s       med=0s       max=3.78ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=5.64ms   min=0s       med=4.39ms   max=144.09ms p(90)=9.28ms   p(95)=15.15ms
+     http_reqs.........................: 363924  740.662204/s
+     ✓ { endpoint:Like }...............: 22840   46.484224/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 45096   91.779885/s
+     ✓ { endpoint:ProfileNameBio }.....: 45096   91.779885/s
+     ✓ { endpoint:TokenRefresh }.......: 14445   29.398626/s
+     ✓ { endpoint:tweets_page1 }.......: 45220   92.032251/s
+     ✓ { endpoint:tweets_page2 }.......: 40778   82.991843/s
+     ✓ { endpoint:tweets_page3 }.......: 36673   74.637301/s
+     ✓ { endpoint:tweets_page4plus }...: 113776  231.55819/s
+     iteration_duration................: avg=107.23ms min=14.55ms  med=104.16ms max=465.66ms p(90)=147.53ms p(95)=163.74ms
+     iterations........................: 22610   46.016125/s
+     vus...............................: 5       min=0        max=5
+                                                                                                                                                                                                                
+running (8m11.3s), 0/5 VUs, 22610 complete and 0 interrupted iterations                                                                                                                                         
+default ✓ [======================================] 0/5 VUs  8m10s                                                                                                                                               
+
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPoolRefresh.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0000] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPoolRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 5 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 5 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0000] [SETUP] Found 4621 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0000] [SETUP] Pool already satisfies minimum required size. Using all 4621 active user sessions!  source=console                                                                                           
+INFO[0000] [SETUP] Loading profile UUIDs...     source=console                                                                                                                                                  
+INFO[0001] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0001] #SETUP COMPLETE# Logged-in Pool: 4621 | Profiles: 10000 | Tweets: 10000  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     checks............................: 100.00% ✓ 29126      ✗ 0
+     data_received.....................: 4.5 GB  9.3 MB/s
+     data_sent.........................: 47 MB   96 kB/s
+     group_duration....................: avg=6.41ms   min=538.5µs med=5.39ms   max=211.12ms p(90)=9.89ms   p(95)=15.52ms
+     http_req_blocked..................: avg=365ns    min=0s      med=0s       max=4.8ms    p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=8ns      min=0s      med=0s       max=1ms      p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=6.42ms   min=523µs   med=5.39ms   max=211.12ms p(90)=10.09ms  p(95)=15.28ms
+     ✓ { endpoint:Like }...............: avg=18.04ms  min=7.29ms  med=17.17ms  max=72.69ms  p(90)=22.89ms  p(95)=26.12ms
+     ✓ { endpoint:Login }..............: avg=0s       min=0s      med=0s       max=0s       p(90)=0s       p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=6.85ms   min=2.04ms  med=6.02ms   max=211.12ms p(90)=10.16ms  p(95)=11.76ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=5.14ms   min=1.04ms  med=4.86ms   max=105.54ms p(90)=7.09ms   p(95)=8.13ms
+     ✓ { endpoint:TokenRefresh }.......: avg=8.81ms   min=3.15ms  med=8.27ms   max=37.33ms  p(90)=11.77ms  p(95)=13.15ms
+     ✓ { endpoint:tweets_page1 }.......: avg=5.38ms   min=1.07ms  med=4.97ms   max=105.65ms p(90)=7.69ms   p(95)=8.83ms
+     ✓ { endpoint:tweets_page2 }.......: avg=5.32ms   min=523µs   med=4.93ms   max=110.51ms p(90)=7.64ms   p(95)=8.75ms
+     ✓ { endpoint:tweets_page3 }.......: avg=5.33ms   min=1.07ms  med=4.93ms   max=106.67ms p(90)=7.64ms   p(95)=8.77ms
+     ✓ { endpoint:tweets_page4plus }...: avg=5.32ms   min=538.5µs med=4.93ms   max=205.4ms  p(90)=7.63ms   p(95)=8.75ms
+       { expected_response:true }......: avg=6.42ms   min=523µs   med=5.39ms   max=211.12ms p(90)=10.09ms  p(95)=15.28ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 369111
+     http_req_receiving................: avg=736.54µs min=0s      med=548.4µs  max=19.91ms  p(90)=1.63ms   p(95)=2.14ms
+     http_req_sending..................: avg=140.98µs min=0s      med=0s       max=8.67ms   p(90)=549.2µs  p(95)=560.4µs
+     http_req_tls_handshaking..........: avg=40ns     min=0s      med=0s       max=4.29ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=5.54ms   min=506.9µs med=4.38ms   max=210.46ms p(90)=9.07ms   p(95)=14.84ms
+     http_reqs.........................: 369111  751.542596/s
+     ✓ { endpoint:Like }...............: 22770   46.361731/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 45857   93.368902/s
+     ✓ { endpoint:ProfileNameBio }.....: 45857   93.368902/s
+     ✓ { endpoint:TokenRefresh }.......: 14563   29.651554/s
+     ✓ { endpoint:tweets_page1 }.......: 45918   93.493103/s
+     ✓ { endpoint:tweets_page2 }.......: 41353   84.19836/s
+     ✓ { endpoint:tweets_page3 }.......: 37235   75.813749/s
+     ✓ { endpoint:tweets_page4plus }...: 115558  235.286294/s
+     iteration_duration................: avg=105.6ms  min=17.44ms med=103.66ms max=341.62ms p(90)=144.62ms p(95)=158.71ms
+     iterations........................: 22959   46.746552/s
+     vus...............................: 5       min=0        max=5
+                                                                                                                                                                                                                
+running (8m11.1s), 0/5 VUs, 22959 complete and 0 interrupted iterations                                                                                                                                         
+default ✓ [======================================] 0/5 VUs  8m10s                                                                                                                                               
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPoolRefresh.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0000] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPoolRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 8 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 8 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0000] [SETUP] Found 4621 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0000] [SETUP] Pool already satisfies minimum required size. Using all 4621 active user sessions!  source=console                                                                                           
+INFO[0000] [SETUP] Loading profile UUIDs...     source=console                                                                                                                                                  
+INFO[0001] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0001] #SETUP COMPLETE# Logged-in Pool: 4621 | Profiles: 10000 | Tweets: 10000  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     checks............................: 100.00% ✓ 37008      ✗ 0
+     data_received.....................: 5.1 GB  10 MB/s
+     data_sent.........................: 54 MB   109 kB/s
+     group_duration....................: avg=9.08ms   min=1.54ms  med=7.86ms   max=122.82ms p(90)=14.18ms  p(95)=19.07ms
+     http_req_blocked..................: avg=383ns    min=0s      med=0s       max=8.67ms   p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=19ns     min=0s      med=0s       max=1.9ms    p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=9.12ms   min=1.05ms  med=7.96ms   max=122.83ms p(90)=14.37ms  p(95)=18.96ms
+     ✓ { endpoint:Like }...............: avg=21.66ms  min=7.89ms  med=20.71ms  max=83.47ms  p(90)=27.96ms  p(95)=31.55ms
+     ✓ { endpoint:Login }..............: avg=0s       min=0s      med=0s       max=0s       p(90)=0s       p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=9.49ms   min=2.08ms  med=8.68ms   max=122.83ms p(90)=14.04ms  p(95)=16.2ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=7.64ms   min=1.54ms  med=7.17ms   max=109.18ms p(90)=10.83ms  p(95)=12.2ms
+     ✓ { endpoint:TokenRefresh }.......: avg=12.03ms  min=3.58ms  med=11.44ms  max=52.73ms  p(90)=16.48ms  p(95)=18.62ms
+     ✓ { endpoint:tweets_page1 }.......: avg=7.93ms   min=1.05ms  med=7.52ms   max=112.3ms  p(90)=11.46ms  p(95)=13.04ms
+     ✓ { endpoint:tweets_page2 }.......: avg=7.94ms   min=1.57ms  med=7.54ms   max=119.33ms p(90)=11.45ms  p(95)=13.06ms
+     ✓ { endpoint:tweets_page3 }.......: avg=7.94ms   min=1.57ms  med=7.53ms   max=113.54ms p(90)=11.45ms  p(95)=12.99ms
+     ✓ { endpoint:tweets_page4plus }...: avg=7.95ms   min=1.5ms   med=7.55ms   max=117.87ms p(90)=11.45ms  p(95)=13.03ms
+       { expected_response:true }......: avg=9.12ms   min=1.05ms  med=7.96ms   max=122.83ms p(90)=14.37ms  p(95)=18.96ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 418809
+     http_req_receiving................: avg=984.79µs min=0s      med=609.79µs max=25.48ms  p(90)=2.19ms   p(95)=2.77ms
+     http_req_sending..................: avg=131.46µs min=0s      med=0s       max=2.51ms   p(90)=549.1µs  p(95)=560.2µs
+     http_req_tls_handshaking..........: avg=61ns     min=0s      med=0s       max=6.84ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=8.01ms   min=510.7µs med=6.71ms   max=121.22ms p(90)=13.11ms  p(95)=18.32ms
+     http_reqs.........................: 418809  852.376857/s
+     ✓ { endpoint:Like }...............: 25876   52.663872/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 52019   105.871153/s
+     ✓ { endpoint:ProfileNameBio }.....: 52019   105.871153/s
+     ✓ { endpoint:TokenRefresh }.......: 18504   37.660082/s
+     ✓ { endpoint:tweets_page1 }.......: 51814   105.453929/s
+     ✓ { endpoint:tweets_page2 }.......: 46701   95.047746/s
+     ✓ { endpoint:tweets_page3 }.......: 42041   85.563528/s
+     ✓ { endpoint:tweets_page4plus }...: 129835  264.245394/s
+     iteration_duration................: avg=149.76ms min=25.45ms med=148.21ms max=431.08ms p(90)=202.99ms p(95)=221.66ms
+     iterations........................: 25907   52.726964/s
+     vus...............................: 8       min=0        max=8
+                                                                                                                                                                                                                
+running (8m11.3s), 0/8 VUs, 25907 complete and 0 interrupted iterations                                                                                                                                         
+default ✓ [======================================] 0/8 VUs  8m10s                                                                                                                                               
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPostRefresh.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0001] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPostRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 8 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 8 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0002] [SETUP] Found 29640 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0002] [SETUP] Pool already satisfies minimum required size. Using all 29640 active user sessions!  source=console
+INFO[0002] [SETUP] Loading profile UUIDs...     source=console
+INFO[0002] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0002] [SETUP] Loading realistic tweet content for posting...  source=console
+INFO[0003] #SETUP COMPLETE# Logged-in Pool: 29640 | Profiles: 10000 | TweetsToLike: 10000 | TweetsToPost: 15115  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/tweets (page=8)
+
+     █ GET /api/tweets (page=9)
+
+     █ GET /api/tweets (page=10)
+
+     █ GET /api/tweets (page=11)
+
+     █ GET /api/tweets (page=12)
+
+     █ GET /api/tweets (page=13)
+
+     █ GET /api/tweets (page=14)
+
+     █ GET /api/tweets (page=15)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     █ POST /api/tweets
+
+       ✓ tweet created status is 201
+       ✓ tweet has tweetId
+
+     checks............................: 100.00% ✓ 43958      ✗ 0
+     data_received.....................: 5.7 GB  12 MB/s
+     data_sent.........................: 51 MB   104 kB/s
+     group_duration....................: avg=8.94ms  min=899.59µs med=7.72ms   max=132.54ms p(90)=13.94ms  p(95)=18.58ms
+     http_req_blocked..................: avg=387ns   min=0s       med=0s       max=8.32ms   p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=7ns     min=0s       med=0s       max=1ms      p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=9.01ms  min=899.59µs med=7.76ms   max=132.54ms p(90)=14.3ms   p(95)=18.56ms
+     ✓ { endpoint:CreateTweet }........: avg=20.76ms min=9.05ms   med=19.96ms  max=86.42ms  p(90)=26.76ms  p(95)=29.49ms
+     ✓ { endpoint:Like }...............: avg=21.9ms  min=8.39ms   med=20.79ms  max=122.26ms p(90)=28.79ms  p(95)=32.56ms
+     ✓ { endpoint:Login }..............: avg=0s      min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=9.84ms  min=2.45ms   med=8.8ms    max=132.54ms p(90)=14.55ms  p(95)=16.86ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=8.25ms  min=1.97ms   med=7.57ms   max=119.73ms p(90)=11.59ms  p(95)=13.34ms
+     ✓ { endpoint:TokenRefresh }.......: avg=12.66ms min=4.23ms   med=11.99ms  max=74.7ms   p(90)=17.22ms  p(95)=19.37ms
+     ✓ { endpoint:tweets_page1 }.......: avg=7.81ms  min=1.57ms   med=7.21ms   max=114.95ms p(90)=11.44ms  p(95)=13.18ms
+     ✓ { endpoint:tweets_page2 }.......: avg=7.82ms  min=1.54ms   med=7.26ms   max=113.21ms p(90)=11.44ms  p(95)=13.14ms
+     ✓ { endpoint:tweets_page3 }.......: avg=7.8ms   min=1.53ms   med=7.23ms   max=112.28ms p(90)=11.37ms  p(95)=13.1ms
+     ✓ { endpoint:tweets_page4plus }...: avg=7.83ms  min=899.59µs med=7.24ms   max=131.61ms p(90)=11.45ms  p(95)=13.14ms
+       { expected_response:true }......: avg=9.01ms  min=899.59µs med=7.76ms   max=132.54ms p(90)=14.3ms   p(95)=18.56ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 423560
+     http_req_receiving................: avg=1.01ms  min=0s       med=681.8µs  max=22.96ms  p(90)=2.21ms   p(95)=2.79ms
+     http_req_sending..................: avg=142.5µs min=0s       med=0s       max=3.57ms   p(90)=553.5µs  p(95)=570.4µs
+     http_req_tls_handshaking..........: avg=70ns    min=0s       med=0s       max=7.77ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=7.85ms  min=512.2µs  med=6.58ms   max=131.99ms p(90)=12.97ms  p(95)=17.78ms
+     http_reqs.........................: 423560  857.802723/s
+     ✓ { endpoint:CreateTweet }........: 3434    6.95461/s
+     ✓ { endpoint:Like }...............: 19383   39.254864/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 38555   78.082406/s
+     ✓ { endpoint:ProfileNameBio }.....: 38555   78.082406/s
+     ✓ { endpoint:TokenRefresh }.......: 18545   37.557729/s
+     ✓ { endpoint:tweets_page1 }.......: 38642   78.258601/s
+     ✓ { endpoint:tweets_page2 }.......: 34730   70.335935/s
+     ✓ { endpoint:tweets_page3 }.......: 31189   63.164626/s
+     ✓ { endpoint:tweets_page4plus }...: 200527  406.111547/s
+     iteration_duration................: avg=200.8ms min=33.53ms  med=195.45ms max=707.36ms p(90)=295.56ms p(95)=326.12ms
+     iterations........................: 19321   39.1293/s
+     vus...............................: 8       min=0        max=8
+
+running (8m13.8s), 0/8 VUs, 19321 complete and 0 interrupted iterations
+default ✓ [======================================] 0/8 VUs  8m10s
+
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPostRefresh.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0000] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPostRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 8 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 8 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0006] [SETUP] Found 29640 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0006] [SETUP] Pool already satisfies minimum required size. Using all 29640 active user sessions!  source=console
+INFO[0006] [SETUP] Loading profile UUIDs...     source=console
+INFO[0006] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0007] [SETUP] Loading realistic tweet content for posting...  source=console
+INFO[0007] #SETUP COMPLETE# Logged-in Pool: 29640 | Profiles: 10000 | TweetsToLike: 10000 | TweetsToPost: 15115  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/tweets (page=8)
+
+     █ GET /api/tweets (page=9)
+
+     █ GET /api/tweets (page=10)
+
+     █ GET /api/tweets (page=11)
+
+     █ GET /api/tweets (page=12)
+
+     █ GET /api/tweets (page=13)
+
+     █ GET /api/tweets (page=14)
+
+     █ GET /api/tweets (page=15)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     █ POST /api/tweets
+
+       ✓ tweet created status is 201
+       ✓ tweet has tweetId
+
+     checks............................: 100.00% ✓ 46422      ✗ 0
+     data_received.....................: 6.0 GB  12 MB/s
+     data_sent.........................: 55 MB   110 kB/s
+     group_duration....................: avg=8.35ms   min=1.52ms  med=7.2ms    max=216.81ms p(90)=12.67ms p(95)=17.29ms
+     http_req_blocked..................: avg=405ns    min=0s      med=0s       max=7.69ms   p(90)=0s      p(95)=0s
+     http_req_connecting...............: avg=7ns      min=0s      med=0s       max=1.16ms   p(90)=0s      p(95)=0s
+     http_req_duration.................: avg=8.41ms   min=1.47ms  med=7.24ms   max=216.81ms p(90)=13.06ms p(95)=17.24ms
+     ✓ { endpoint:CreateTweet }........: avg=19.73ms  min=9.25ms  med=18.94ms  max=87.19ms  p(90)=24.96ms p(95)=27.33ms
+     ✓ { endpoint:Like }...............: avg=20.75ms  min=9.12ms  med=19.67ms  max=110.86ms p(90)=27.05ms p(95)=30.69ms
+     ✓ { endpoint:Login }..............: avg=0s       min=0s      med=0s       max=0s       p(90)=0s      p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=9.02ms   min=2.61ms  med=8.09ms   max=216.81ms p(90)=13.33ms p(95)=15.4ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=7.66ms   min=1.7ms   med=7.04ms   max=209.69ms p(90)=10.62ms p(95)=12.09ms
+     ✓ { endpoint:TokenRefresh }.......: avg=11.93ms  min=4.83ms  med=11.32ms  max=65.47ms  p(90)=15.97ms p(95)=17.83ms
+     ✓ { endpoint:tweets_page1 }.......: avg=7.28ms   min=1.53ms  med=6.87ms   max=112.56ms p(90)=10.48ms p(95)=11.99ms
+     ✓ { endpoint:tweets_page2 }.......: avg=7.3ms    min=1.6ms   med=6.93ms   max=206.5ms  p(90)=10.47ms p(95)=11.91ms
+     ✓ { endpoint:tweets_page3 }.......: avg=7.29ms   min=1.6ms   med=6.88ms   max=110.56ms p(90)=10.5ms  p(95)=12.01ms
+     ✓ { endpoint:tweets_page4plus }...: avg=7.32ms   min=1.47ms  med=6.92ms   max=211.65ms p(90)=10.5ms  p(95)=11.99ms
+       { expected_response:true }......: avg=8.41ms   min=1.47ms  med=7.24ms   max=216.81ms p(90)=13.06ms p(95)=17.24ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0          ✗ 452751
+     http_req_receiving................: avg=960µs    min=0s      med=612.7µs  max=25.59ms  p(90)=2.16ms  p(95)=2.7ms
+     http_req_sending..................: avg=154.4µs  min=0s      med=0s       max=3.76ms   p(90)=550.6µs p(95)=563.2µs
+     http_req_tls_handshaking..........: avg=46ns     min=0s      med=0s       max=3.12ms   p(90)=0s      p(95)=0s
+   ✓ http_req_waiting..................: avg=7.3ms    min=514.1µs med=6.06ms   max=213.62ms p(90)=11.83ms p(95)=16.52ms
+     http_reqs.........................: 452751  908.953066/s
+     ✓ { endpoint:CreateTweet }........: 3540    7.106983/s
+     ✓ { endpoint:Like }...............: 20716   41.589906/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 41225   82.764235/s
+     ✓ { endpoint:ProfileNameBio }.....: 41225   82.764235/s
+     ✓ { endpoint:TokenRefresh }.......: 19671   39.491941/s
+     ✓ { endpoint:tweets_page1 }.......: 41146   82.605633/s
+     ✓ { endpoint:tweets_page2 }.......: 37007   74.296084/s
+     ✓ { endpoint:tweets_page3 }.......: 33356   66.966254/s
+     ✓ { endpoint:tweets_page4plus }...: 214865  431.367795/s
+     iteration_duration................: avg=188.57ms min=32.5ms  med=183.56ms max=657.9ms  p(90)=277.2ms p(95)=304.7ms
+     iterations........................: 20573   41.302816/s
+     vus...............................: 5       min=0        max=8
+
+running (8m18.1s), 0/8 VUs, 20573 complete and 0 interrupted iterations
+default ✓ [======================================] 0/8 VUs  8m10s
+
+PS C:\EPAM\TwitterXT\TwitterXT> k6 run k6/TwitterGPTtest5sqlPostRefresh.js
+INFO[0000] Automatic extension resolution is enabled. The current k6 binary doesn't satisfy all dependencies, it's required to provision a custom binary.  deps="k6/x/sql;k6/x/sql/driver/mysql"
+INFO[0000] A new k6 binary has been provisioned with version(s): k6:v1.8.1 k6/x/sql:v1.0.5 k6/x/sql/driver/mysql:v0.2.1
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: k6/TwitterGPTtest5sqlPostRefresh.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 8 max VUs, 8m40s max duration (incl. graceful stop):
+              * default: Up to 8 looping VUs for 8m10s over 5 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] [SETUP] Connecting to MySQL database at 127.0.0.1:3306...  source=console
+INFO[0000] [SETUP] Querying active refresh tokens (valid > NOW())...  source=console
+INFO[0013] [SETUP] Found 29640 users with valid refresh tokens in DB (Required minimum: 1000).  source=console
+INFO[0013] [SETUP] Pool already satisfies minimum required size. Using all 29640 active user sessions!  source=console
+INFO[0013] [SETUP] Loading profile UUIDs...     source=console
+INFO[0014] [SETUP] Loading tweet IDs for likes...  source=console
+INFO[0014] [SETUP] Loading realistic tweet content for posting...  source=console
+INFO[0015] #SETUP COMPLETE# Logged-in Pool: 29640 | Profiles: 10000 | TweetsToLike: 10000 | TweetsToPost: 15115  source=console
+     ✓ refresh status is 200
+     ✓ refreshed JWT received
+
+     █ GET /api/tweets (page=1)
+
+     █ GET /api/tweets (page=2)
+
+     █ GET /api/tweets (page=3)
+
+     █ GET /api/tweets (page=4)
+
+     █ GET /api/tweets (page=5)
+
+     █ GET /api/tweets (page=6)
+
+     █ GET /api/tweets (page=7)
+
+     █ GET /api/profiles/{id}
+
+     █ GET /api/profiles/{id}/tweets
+
+     █ POST /api/tweets/{id}/likes/toggle
+
+     █ GET /api/tweets (page=8)
+
+     █ GET /api/tweets (page=9)
+
+     █ GET /api/tweets (page=10)
+
+     █ GET /api/tweets (page=11)
+
+     █ GET /api/tweets (page=12)
+
+     █ GET /api/tweets (page=13)
+
+     █ GET /api/tweets (page=14)
+
+     █ GET /api/tweets (page=15)
+
+     █ POST /api/tweets
+
+       ✓ tweet created status is 201
+       ✓ tweet has tweetId
+
+     checks............................: 100.00% ✓ 51592       ✗ 0
+     data_received.....................: 6.8 GB  13 MB/s
+     data_sent.........................: 61 MB   121 kB/s
+     group_duration....................: avg=7.47ms   min=0s       med=6.55ms   max=212.57ms p(90)=10.99ms  p(95)=15.62ms
+     http_req_blocked..................: avg=358ns    min=0s       med=0s       max=7.57ms   p(90)=0s       p(95)=0s
+     http_req_connecting...............: avg=15ns     min=0s       med=0s       max=5.15ms   p(90)=0s       p(95)=0s
+     http_req_duration.................: avg=7.53ms   min=0s       med=6.57ms   max=212.57ms p(90)=11.44ms  p(95)=15.53ms
+     ✓ { endpoint:CreateTweet }........: avg=17.95ms  min=7.99ms   med=17.53ms  max=70.87ms  p(90)=22.28ms  p(95)=23.93ms
+     ✓ { endpoint:Like }...............: avg=19.02ms  min=7.38ms   med=18.2ms   max=99.36ms  p(90)=24.14ms  p(95)=27.36ms
+     ✓ { endpoint:Login }..............: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s
+     ✓ { endpoint:ProfileFeed }........: avg=8ms      min=2.1ms    med=7.16ms   max=212.57ms p(90)=11.64ms  p(95)=13.44ms
+     ✓ { endpoint:ProfileNameBio }.....: avg=6.7ms    min=539.29µs med=6.27ms   max=113.64ms p(90)=9.34ms   p(95)=10.5ms
+     ✓ { endpoint:TokenRefresh }.......: avg=10.79ms  min=3.19ms   med=10.35ms  max=50.72ms  p(90)=14.26ms  p(95)=15.8ms
+     ✓ { endpoint:tweets_page1 }.......: avg=6.54ms   min=505.49µs med=6.12ms   max=119.9ms  p(90)=9.3ms    p(95)=10.41ms
+     ✓ { endpoint:tweets_page2 }.......: avg=6.54ms   min=539.29µs med=6.14ms   max=138.84ms p(90)=9.3ms    p(95)=10.44ms
+     ✓ { endpoint:tweets_page3 }.......: avg=6.52ms   min=0s       med=6.12ms   max=114.39ms p(90)=9.27ms   p(95)=10.43ms
+     ✓ { endpoint:tweets_page4plus }...: avg=6.54ms   min=516µs    med=6.15ms   max=207.03ms p(90)=9.3ms    p(95)=10.43ms
+       { expected_response:true }......: avg=7.53ms   min=0s       med=6.57ms   max=212.57ms p(90)=11.44ms  p(95)=15.53ms
+   ✓ http_req_failed...................: 0.00%   ✓ 0           ✗ 505851
+     http_req_receiving................: avg=872.14µs min=0s       med=561.5µs  max=17.49ms  p(90)=1.86ms   p(95)=2.3ms
+     http_req_sending..................: avg=140.89µs min=0s       med=0s       max=6.78ms   p(90)=548.69µs p(95)=562.3µs
+     http_req_tls_handshaking..........: avg=38ns     min=0s       med=0s       max=4.06ms   p(90)=0s       p(95)=0s
+   ✓ http_req_waiting..................: avg=6.51ms   min=0s       med=5.47ms   max=212.57ms p(90)=10.36ms  p(95)=14.97ms
+     http_reqs.........................: 505851  1001.167399/s
+     ✓ { endpoint:CreateTweet }........: 3868    7.655447/s
+     ✓ { endpoint:Like }...............: 23065   45.64966/s
+     ✓ { endpoint:Login }..............: 0       0/s
+     ✓ { endpoint:ProfileFeed }........: 45961   90.964839/s
+     ✓ { endpoint:ProfileNameBio }.....: 45961   90.964839/s
+     ✓ { endpoint:TokenRefresh }.......: 21928   43.399338/s
+     ✓ { endpoint:tweets_page1 }.......: 46034   91.109319/s
+     ✓ { endpoint:tweets_page2 }.......: 41373   81.884387/s
+     ✓ { endpoint:tweets_page3 }.......: 37275   73.773729/s
+     ✓ { endpoint:tweets_page4plus }...: 240386  475.765841/s
+     iteration_duration................: avg=168.55ms min=28.01ms  med=165.55ms max=531.85ms p(90)=245.33ms p(95)=267.69ms
+     iterations........................: 23017   45.554659/s
+     vus...............................: 8       min=0         max=8
+
+running (8m25.3s), 0/8 VUs, 23017 complete and 0 interrupted iterations
+default ✓ [======================================] 0/8 VUs  8m10s
