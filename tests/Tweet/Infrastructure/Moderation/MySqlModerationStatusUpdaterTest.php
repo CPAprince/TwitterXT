@@ -150,4 +150,21 @@ final class MySqlModerationStatusUpdaterTest extends TestCase
         // Params order: [targetStatus, binaryId, moderationVersion, pendingStatus]
         self::assertSame($version, $captured[2]);
     }
+
+    #[Test]
+    public function applyReturnsOnlySuccessfullyUpdatedDecisions(): void
+    {
+        $d1 = new ModerationDecision('019b5f3f-d110-7908-9177-5df439942a8b', true, 1, userId: 'author-1');
+        $d2 = new ModerationDecision('019b5f41-0e5b-7f65-8b7a-0f9c0b3b3c11', true, 1, userId: 'author-2'); // version conflict -> returns 0
+        $d3 = new ModerationDecision('550e8400-e29b-41d4-a716-446655440000', false, 2, userId: 'author-3');
+
+        $this->connection
+            ->expects(self::exactly(3))
+            ->method('executeStatement')
+            ->willReturnOnConsecutiveCalls(1, 0, 1);
+
+        $applied = $this->updater->apply([$d1, $d2, $d3]);
+
+        self::assertSame([$d1, $d3], $applied);
+    }
 }

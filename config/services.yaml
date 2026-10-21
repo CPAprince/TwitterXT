@@ -300,6 +300,11 @@ services:
         alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationRateLimiter
         public: true
 
+    Twitter\Tweet\Application\Moderation\ModeratedTweetsCacheInvalidatorInterface:
+        class: Twitter\Tweet\Infrastructure\Cache\ModeratedTweetsCacheInvalidator
+        arguments:
+            $cacheTweets: '@cache.tweets'
+
     Twitter\Tweet\Application\Moderation\ModerationWorkerLockInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock
         public: true

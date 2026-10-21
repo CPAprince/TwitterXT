@@ -10,5 +10,6 @@ final readonly class ModerationTweetCandidate
         public string $tweetId,
         public string $text,
         public int $moderationVersion,
+        public string $userId = '',
     ) {}
 }

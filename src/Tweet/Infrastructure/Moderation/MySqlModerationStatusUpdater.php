@@ -7,6 +7,7 @@ namespace Twitter\Tweet\Infrastructure\Moderation;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Twitter\Shared\Infrastructure\Persistence\Doctrine\UuidBinaryConverter;
+use Twitter\Tweet\Application\Moderation\ModerationDecision;
 use Twitter\Tweet\Application\Moderation\ModerationStatusUpdaterInterface;
 use Twitter\Tweet\Domain\Tweet\Model\Tweet;
 
@@ -16,10 +17,15 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
         private Connection $connection,
     ) {}
 
-    public function apply(array $decisions): void
+    /**
+     * @param list<ModerationDecision> $decisions
+     *
+     * @return list<ModerationDecision>
+     */
+    public function apply(array $decisions): array
     {
         if ([] === $decisions) {
-            return;
+            return [];
         }
 
         $sql = '
@@ -31,8 +37,10 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
           AND moderation_status = ?
     ';
 
+        $applied = [];
+
         foreach ($decisions as $decision) {
-            $this->connection->executeStatement(
+            $affected = $this->connection->executeStatement(
                 $sql,
                 [
                     $decision->approved
@@ -49,6 +57,12 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
                     ParameterType::INTEGER,
                 ]
             );
+
+            if ($affected > 0) {
+                $applied[] = $decision;
+            }
         }
+
+        return $applied;
     }
 }

@@ -31,7 +31,7 @@ final readonly class MySqlModerationTweetSource implements ModerationTweetSource
         $placeholders = implode(', ', array_fill(0, count($binaryIds), '?'));
 
         $sql = sprintf(
-            'SELECT BIN_TO_UUID(id) AS id, content, moderation_version
+            'SELECT BIN_TO_UUID(id) AS id, BIN_TO_UUID(user_id) AS user_id, content, moderation_version
              FROM tweets
              WHERE id IN (%s)
                AND moderation_status = ?',
@@ -52,6 +52,7 @@ final readonly class MySqlModerationTweetSource implements ModerationTweetSource
 
         foreach ($rows as $row) {
             $tweetId = (string) $row['id'];
+            $userId = (string) ($row['user_id'] ?? '');
             $content = (string) $row['content'];
             $moderationVersion = (int) $row['moderation_version'];
 
@@ -59,6 +60,7 @@ final readonly class MySqlModerationTweetSource implements ModerationTweetSource
                 tweetId: $tweetId,
                 text: $content,
                 moderationVersion: $moderationVersion,
+                userId: $userId,
             );
         }
 

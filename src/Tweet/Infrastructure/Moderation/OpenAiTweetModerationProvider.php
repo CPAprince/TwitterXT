@@ -71,6 +71,7 @@ final class OpenAiTweetModerationProvider implements TweetModerationProviderInte
                 moderationVersion: $item->moderationVersion,
                 reason: $flagged ? 'Rejected by OpenAI moderation.' : null,
                 categories: [],
+                userId: $item->userId,
             );
         }
 

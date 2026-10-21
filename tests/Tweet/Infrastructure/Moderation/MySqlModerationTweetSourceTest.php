@@ -39,12 +39,13 @@ final class MySqlModerationTweetSourceTest extends TestCase
     {
         // Arrange
         $tweetId = '019b5f3f-d110-7908-9177-5df439942a8b';
+        $userId = '019b5f41-0e5b-7f65-8b7a-0f9c0b3b3c11';
 
         $this->connection
             ->expects(self::once())
             ->method('fetchAllAssociative')
             ->willReturn([
-                ['id' => $tweetId, 'content' => 'Hello world', 'moderation_version' => 1],
+                ['id' => $tweetId, 'user_id' => $userId, 'content' => 'Hello world', 'moderation_version' => 1],
             ]);
 
         // Act
@@ -53,6 +54,7 @@ final class MySqlModerationTweetSourceTest extends TestCase
         // Assert
         self::assertCount(1, $candidates);
         self::assertSame($tweetId, $candidates[0]->tweetId);
+        self::assertSame($userId, $candidates[0]->userId);
         self::assertSame('Hello world', $candidates[0]->text);
         self::assertSame(1, $candidates[0]->moderationVersion);
     }
@@ -101,9 +103,9 @@ final class MySqlModerationTweetSourceTest extends TestCase
         $this->connection
             ->method('fetchAllAssociative')
             ->willReturn([
-                ['id' => $id3, 'content' => 'C', 'moderation_version' => 1],
-                ['id' => $id1, 'content' => 'A', 'moderation_version' => 1],
-                ['id' => $id2, 'content' => 'B', 'moderation_version' => 2],
+                ['id' => $id3, 'user_id' => 'user-3', 'content' => 'C', 'moderation_version' => 1],
+                ['id' => $id1, 'user_id' => 'user-1', 'content' => 'A', 'moderation_version' => 1],
+                ['id' => $id2, 'user_id' => 'user-2', 'content' => 'B', 'moderation_version' => 2],
             ]);
 
         // Act
@@ -125,8 +127,8 @@ final class MySqlModerationTweetSourceTest extends TestCase
         $this->connection
             ->method('fetchAllAssociative')
             ->willReturn([
-                ['id' => $id1, 'content' => 'A', 'moderation_version' => 1],
-                ['id' => $id2, 'content' => 'B', 'moderation_version' => 3],
+                ['id' => $id1, 'user_id' => 'user-1', 'content' => 'A', 'moderation_version' => 1],
+                ['id' => $id2, 'user_id' => 'user-2', 'content' => 'B', 'moderation_version' => 3],
             ]);
 
         $candidates = $this->source->findByIds([$id1, $id2]);

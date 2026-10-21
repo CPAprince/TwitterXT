@@ -27,6 +27,7 @@ final readonly class DemoTweetModerationProvider implements TweetModerationProvi
                 moderationVersion: $item->moderationVersion,
                 reason: $approved ? null : 'Rejected in demo mode by probability policy.',
                 categories: [],
+                userId: $item->userId,
             );
         }
 

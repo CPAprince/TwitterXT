@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+use Twitter\Tweet\Application\Moderation\ModeratedTweetsCacheInvalidatorInterface;
 use Twitter\Tweet\Application\Moderation\ModerationBatchBuilder;
 use Twitter\Tweet\Application\Moderation\ModerationBatchItem;
 use Twitter\Tweet\Application\Moderation\ModerationConfig;
@@ -37,6 +38,7 @@ final class ModerationFlushWorkerCommand extends Command
         private readonly TweetModerationProviderInterface $provider,
         private readonly ModerationStatusUpdaterInterface $statusUpdater,
         private readonly ModerationWorkerLockInterface $workerLock,
+        private readonly ModeratedTweetsCacheInvalidatorInterface $cacheInvalidator,
     ) {
         parent::__construct();
     }
@@ -89,6 +91,7 @@ final class ModerationFlushWorkerCommand extends Command
                 text: $candidate->text,
                 estimatedTokens: $this->tokenEstimator->estimate($candidate->text),
                 moderationVersion: $candidate->moderationVersion,
+                userId: $candidate->userId,
             );
         }
 
@@ -156,7 +159,18 @@ final class ModerationFlushWorkerCommand extends Command
 
         [$approvedIds, $rejectedIds] = $this->splitDecisionIds($decisions);
 
-        $this->statusUpdater->apply($decisions);
+        $appliedDecisions = $this->statusUpdater->apply($decisions);
+
+        $approvedAuthorIds = [];
+        foreach ($appliedDecisions as $decision) {
+            if ($decision->approved && '' !== $decision->userId) {
+                $approvedAuthorIds[] = $decision->userId;
+            }
+        }
+
+        if ([] !== $approvedAuthorIds) {
+            $this->cacheInvalidator->invalidateAuthorFeeds($approvedAuthorIds);
+        }
 
         $processedIds = array_merge($approvedIds, $rejectedIds);
         $this->queue->remove($processedIds);

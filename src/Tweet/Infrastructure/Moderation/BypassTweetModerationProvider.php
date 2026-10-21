@@ -20,6 +20,7 @@ final class BypassTweetModerationProvider implements TweetModerationProviderInte
                 moderationVersion: $item->moderationVersion,
                 reason: null,
                 categories: [],
+                userId: $item->userId,
             );
         }
 

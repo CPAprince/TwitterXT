@@ -11,5 +11,6 @@ final readonly class ModerationBatchItem
         public string $text,
         public int $estimatedTokens,
         public int $moderationVersion,
+        public string $userId = '',
     ) {}
 }
