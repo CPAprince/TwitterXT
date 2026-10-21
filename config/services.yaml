@@ -239,7 +239,7 @@ services:
         arguments:
             - '@Prometheus\Storage\InMemory'
 
-    Redis:
+    moderation.redis:
         class: Redis
         factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
         arguments:
@@ -261,8 +261,19 @@ services:
         exclude:
             - '../src/Tweet/Infrastructure/Moderation/ModerationConfigFactory.php'
 
+    Twitter\Tweet\Infrastructure\Moderation\RedisModerationRateLimiter:
+        arguments:
+            $redis: '@moderation.redis'
+
+    Twitter\Tweet\Infrastructure\Moderation\RedisModerationQueue:
+        arguments:
+            $redis: '@moderation.redis'
+
+    Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock:
+        arguments:
+            $redis: '@moderation.redis'
+
     Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory:
-        public: true
         arguments:
             $mode: '%moderation.mode%'
             $provider: '%moderation.provider%'
@@ -291,28 +302,22 @@ services:
             $workerMaxFetchItems: '%moderation.worker.max_fetch_items%'
 
     Twitter\Tweet\Application\Moderation\ModerationConfig:
-        public: true
         factory: [ '@Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory', 'create' ]
 
     Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface:
-        public: true
         factory: [ '@Twitter\Tweet\Infrastructure\Moderation\TweetModerationProviderResolver', 'resolve' ]
 
     Twitter\Tweet\Application\Moderation\ModerationQueueInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationQueue
-        public: true
 
     Twitter\Tweet\Application\Moderation\ModerationTweetSourceInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\MySqlModerationTweetSource
-        public: true
 
     Twitter\Tweet\Application\Moderation\ModerationStatusUpdaterInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\MySqlModerationStatusUpdater
-        public: true
 
     Twitter\Tweet\Application\Moderation\ModerationRateLimiterInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationRateLimiter
-        public: true
 
     Twitter\Tweet\Application\Moderation\ModeratedTweetsCacheInvalidatorInterface:
         class: Twitter\Tweet\Infrastructure\Cache\ModeratedTweetsCacheInvalidator
@@ -321,14 +326,12 @@ services:
 
     Twitter\Tweet\Application\Moderation\ModerationWorkerLockInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock
-        public: true
 
     Twitter\Tweet\UI\CLI\TestModerationProviderCommand:
         tags: [ 'console.command' ]
 
     Twitter\Tweet\UI\CLI\ModerationFlushWorkerCommand:
         tags: [ 'console.command' ]
-        public: true
 
     app.login_rate_limiter:
         class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
