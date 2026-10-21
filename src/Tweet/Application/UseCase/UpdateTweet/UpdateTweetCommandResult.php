@@ -11,5 +11,6 @@ final readonly class UpdateTweetCommandResult
     public function __construct(
         public string $content,
         public DateTimeImmutable $updatedAt,
+        public string $moderationStatus = 'pending',
     ) {}
 }

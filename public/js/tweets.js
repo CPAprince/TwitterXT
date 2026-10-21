@@ -55,6 +55,13 @@ window.Tweets.applyEditVisibility = async (container = document) => {
   if (!currentUserId) return;
 
   container.querySelectorAll(".tweet-edit-btn").forEach(btn => {
+    const tweetEl = btn.closest(".tweet");
+    const isPending = tweetEl && !tweetEl.querySelector("[data-tweet-pending-badge]")?.classList.contains("d-none");
+    if (isPending) {
+      btn.style.display = "none";
+      return;
+    }
+
     const authorId = btn.dataset.authorId;
     if (authorId === currentUserId) {
       btn.style.display = "inline-block";
@@ -120,9 +127,22 @@ window.Tweets.applyLikeButtonState = async (container = document) => {
     const bootstrapTooltip = window.bootstrap?.Tooltip;
     const existingTooltip = bootstrapTooltip?.getInstance(wrapper) || null;
 
+    const tweetEl = btn.closest(".tweet");
+    const isPending = tweetEl && !tweetEl.querySelector("[data-tweet-pending-badge]")?.classList.contains("d-none");
+
     if (isAuthenticated) {
+      if (isPending) {
+        btn.disabled = true;
+        btn.style.pointerEvents = "none";
+        btn.style.opacity = "0.6";
+        existingTooltip?.dispose();
+        return;
+      }
+
       // Enable and remove guest tooltip.
       btn.disabled = false;
+      btn.style.pointerEvents = "";
+      btn.style.opacity = "";
       wrapper.classList.remove("is-guest-disabled");
       wrapper.dataset.guestDisabled = "false";
       wrapper.removeAttribute("data-bs-toggle");
@@ -339,7 +359,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         Loading.disableForm(form);
 
-        await Api.post(createUrl, { content });
+        const result = await Api.post(createUrl, { content });
+
+        if (result?.moderationStatus === "pending" || result?.moderationStatus === 0) {
+          const currentUserId = await Auth.getCurrentUserId();
+          if (currentUserId && window.PendingTweets) {
+            window.PendingTweets.add({
+              id: result.tweetId,
+              content: content,
+              createdAt: result.createdAt || new Date().toISOString(),
+              authorId: currentUserId,
+              authorName: window.profileData?.name || "You",
+              kind: "create",
+            });
+          }
+        }
 
         const textarea = form.querySelector("textarea");
         if (textarea) {
@@ -430,6 +464,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? window.buildRoute(window.routes.updateTweet, { tweetId: tweetId })
         : `/api/tweets/${tweetId}`;
       const result = await Api.patch(updateTweetUrl, { content });
+
+      if (result?.moderationStatus === "pending" || result?.moderationStatus === 0) {
+        const currentUserId = await Auth.getCurrentUserId();
+        if (currentUserId && window.PendingTweets) {
+          window.PendingTweets.add({
+            id: tweetId,
+            content: result.content || content,
+            createdAt: result.updatedAt || new Date().toISOString(),
+            authorId: currentUserId,
+            authorName: window.profileData?.name || "You",
+            kind: "edit",
+          });
+        }
+        const pendingBadge = tweetElement.querySelector("[data-tweet-pending-badge]");
+        if (pendingBadge) {
+          pendingBadge.classList.remove("d-none");
+        }
+        const likeBtn = tweetElement.querySelector(".tweet-like-btn");
+        if (likeBtn) {
+          likeBtn.disabled = true;
+          likeBtn.style.pointerEvents = "none";
+          likeBtn.style.opacity = "0.6";
+        }
+        const editBtn = tweetElement.querySelector(".tweet-edit-btn");
+        if (editBtn) {
+          editBtn.style.display = "none";
+        }
+      }
 
       // Update tweet display
       contentDisplay.querySelector("p").textContent = result.content;

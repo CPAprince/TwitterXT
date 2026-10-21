@@ -60,6 +60,66 @@
     return u.toString();
   }
 
+  function shouldIncludePending(container) {
+    const url = container.getAttribute("data-tweets-url") || "";
+    const currentUserId = localStorage.getItem("userId");
+    if (!currentUserId || !window.PendingTweets) return false;
+
+    // Home feed (/api/tweets)
+    if (url.includes("/api/tweets") && !url.includes("/api/profiles/")) return true;
+
+    // Author's own profile feed
+    if (url.includes(`/api/profiles/${currentUserId}/tweets`)) return true;
+    if (window.profileData?.userId && window.profileData.userId === currentUserId) return true;
+
+    return false;
+  }
+
+  function mergePendingTweets(container, tweets) {
+    if (!shouldIncludePending(container)) return tweets;
+
+    const currentUserId = localStorage.getItem("userId");
+    const pendingList = window.PendingTweets.getAll(currentUserId);
+    if (!pendingList || pendingList.length === 0) return tweets;
+
+    const result = [...tweets];
+
+    for (const pending of pendingList) {
+      const serverIndex = result.findIndex((t) => t?.id === pending.id);
+      if (serverIndex >= 0) {
+        // Server already returned this tweet approved - clear from local pending
+        window.PendingTweets.remove(pending.id, currentUserId);
+        continue;
+      }
+
+      if (pending.kind === "edit") {
+        const existingIdx = result.findIndex((t) => t?.id === pending.id);
+        if (existingIdx >= 0) {
+          result[existingIdx] = {
+            ...result[existingIdx],
+            content: pending.content,
+            isPending: true,
+          };
+          continue;
+        }
+      }
+
+      result.unshift({
+        id: pending.id,
+        content: pending.content,
+        createdAt: pending.createdAt,
+        author: {
+          id: pending.authorId,
+          name: pending.authorName || window.profileData?.name || "You",
+        },
+        likesCount: 0,
+        isPending: true,
+      });
+    }
+
+    return result;
+  }
+
   function buildTweetNode(tplItem, t) {
     const node = tplItem.content.cloneNode(true);
     const root = node.querySelector(".tweet");
@@ -70,6 +130,7 @@
     const createdAt = t?.createdAt ?? "";
     const content = t?.content ?? "";
     const likes = t?.likesCount ?? 0;
+    const isPending = !!t?.isPending;
 
     if (root) root.dataset.tweetId = tweetId;
 
@@ -81,13 +142,29 @@
     const createdAtEl = node.querySelector("[data-tweet-created-at]");
     if (createdAtEl) createdAtEl.textContent = ' · ' + formatPublishDate(createdAt);
 
+    const pendingBadge = node.querySelector("[data-tweet-pending-badge]");
+    if (pendingBadge) {
+      if (isPending) {
+        pendingBadge.classList.remove("d-none");
+      } else {
+        pendingBadge.classList.add("d-none");
+      }
+    }
+
     const contentEl = node.querySelector("[data-tweet-content]");
     if (contentEl) contentEl.textContent = content;
 
     // like button
     const likeBtn = node.querySelector(".tweet-like-btn");
     const likeCount = node.querySelector(".tweet-like-count");
-    if (likeBtn) likeBtn.dataset.tweetId = tweetId;
+    if (likeBtn) {
+      likeBtn.dataset.tweetId = tweetId;
+      if (isPending) {
+        likeBtn.disabled = true;
+        likeBtn.style.pointerEvents = "none";
+        likeBtn.style.opacity = "0.6";
+      }
+    }
     if (likeCount) likeCount.textContent = String(likes);
 
     const external = node.querySelector("[data-tweet-external-link]");
@@ -97,6 +174,9 @@
     if (editBtn) {
       editBtn.dataset.tweetId = tweetId;
       editBtn.dataset.authorId = authorId;
+      if (isPending) {
+        editBtn.style.display = "none";
+      }
     }
 
     const editFormContainer = node.querySelector(".tweet-edit-form .tweet-form-container");
@@ -150,10 +230,13 @@
     try {
       const data = await getJson(url);
       const tweets = normalizeTweetsPayload(data);
-      renderTweets(container, tweets);
+      const merged = mergePendingTweets(container, tweets);
+      renderTweets(container, merged);
       await applyBehaviors(container);
     } catch (_) {
-      renderTweets(container, []);
+      const merged = mergePendingTweets(container, []);
+      renderTweets(container, merged);
+      await applyBehaviors(container);
     }
   }
 
@@ -178,8 +261,12 @@
         const data = await getJson(pageUrl);
         const tweets = normalizeTweetsPayload(data);
 
-        if (s.page === 1) renderTweets(container, tweets);
-        else appendTweets(container, tweets);
+        if (s.page === 1) {
+          const merged = mergePendingTweets(container, tweets);
+          renderTweets(container, merged);
+        } else {
+          appendTweets(container, tweets);
+        }
 
         await applyBehaviors(container);
 
@@ -191,7 +278,11 @@
 
         s.page += 1;
       } catch (_) {
-        if (s.page === 1) renderTweets(container, []);
+        if (s.page === 1) {
+          const merged = mergePendingTweets(container, []);
+          renderTweets(container, merged);
+          await applyBehaviors(container);
+        }
         s.isDone = true;
         s.observer?.disconnect();
       } finally {

@@ -8,6 +8,7 @@ use Override;
 use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetAccessDeniedException;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
+use Twitter\Tweet\Domain\Tweet\Model\Tweet;
 use Twitter\Tweet\Domain\Tweet\Model\TweetRepository;
 
 final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHandlerInterface
@@ -38,6 +39,12 @@ final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHand
             $this->moderationQueue->enqueue($tweet->id());
         }
 
-        return new UpdateTweetCommandResult($tweet->content(), $tweet->updatedAt());
+        $status = match ($tweet->moderationStatus()) {
+            Tweet::MODERATION_APPROVED => 'approved',
+            Tweet::MODERATION_REJECTED => 'rejected',
+            default => 'pending',
+        };
+
+        return new UpdateTweetCommandResult($tweet->content(), $tweet->updatedAt(), $status);
     }
 }

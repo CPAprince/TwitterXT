@@ -73,6 +73,7 @@ final class UpdateTweetCommandHandlerTest extends TestCase
         self::assertSame('New content', $result->content);
         self::assertSame('New content', $tweet->content());
         self::assertInstanceOf(DateTimeImmutable::class, $result->updatedAt);
+        self::assertSame('pending', $result->moderationStatus);
     }
 
     /**

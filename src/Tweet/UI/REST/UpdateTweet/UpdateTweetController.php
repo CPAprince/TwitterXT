@@ -38,6 +38,7 @@ final readonly class UpdateTweetController
         return new JsonResponse([
             'content' => $result->content,
             'updatedAt' => $result->updatedAt->format(DATE_RFC3339),
+            'moderationStatus' => $result->moderationStatus,
         ], JsonResponse::HTTP_OK);
     }
 }

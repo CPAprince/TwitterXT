@@ -37,6 +37,7 @@ final readonly class CreateTweetController
             'tweetId' => $result->tweetId,
             'createdAt' => $result->createdAt->format(DATE_RFC3339),
             'updatedAt' => $result->updatedAt->format(DATE_RFC3339),
+            'moderationStatus' => $result->moderationStatus,
         ], Response::HTTP_CREATED);
     }
 }

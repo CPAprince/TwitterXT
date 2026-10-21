@@ -60,6 +60,7 @@ final class CreateTweetCommandHandlerTest extends TestCase
         $result = $this->handler->handle($command);
 
         self::assertNotEmpty($result->tweetId);
+        self::assertSame('pending', $result->moderationStatus);
     }
 
     #[Test]

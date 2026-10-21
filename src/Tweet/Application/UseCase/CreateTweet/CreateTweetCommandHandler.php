@@ -24,10 +24,17 @@ final readonly class CreateTweetCommandHandler implements CreateTweetCommandHand
 
         $this->moderationQueue->enqueue($tweet->id());
 
+        $status = match ($tweet->moderationStatus()) {
+            Tweet::MODERATION_APPROVED => 'approved',
+            Tweet::MODERATION_REJECTED => 'rejected',
+            default => 'pending',
+        };
+
         return new CreateTweetCommandResult(
             $tweet->id(),
             $tweet->createdAt(),
             $tweet->updatedAt(),
+            $status,
         );
     }
 }

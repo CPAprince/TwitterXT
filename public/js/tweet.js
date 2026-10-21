@@ -52,26 +52,81 @@ function formatPublishDate(isoString) {
 
 
 function showTweet(tweet) {
-
   console.log('Tweet JSON data in show:', tweet);
-  document.querySelector('[tweet_author]').innerHTML = '<a href=\"\/p\/' + tweet.author.id + '\"  style=\"color: var(--bs-body-color);\">' + tweet.author.name + '</a>';
-  document.querySelector('[tweet_createdAt]').textContent = ' · ' + formatPublishDate(tweet.createdAt);
-  document.querySelector('[data-tweet-content]').textContent = tweet.content;
-  document.querySelector('[tweet_likes]').textContent = tweet.likesCount;
-  document.querySelector(".tweet-like-btn").setAttribute('data-tweet-id', tweet.id);
-  document.querySelector(".tweet-form-container").setAttribute('data-tweet-id', tweet.id);
-  document.querySelector(".tweet-edit-btn").setAttribute('data-tweet-id', tweet.id);
-  document.querySelector(".tweet-edit-btn").setAttribute('data-author-id', tweet.author.id);
+  const authorId = tweet?.author?.id ?? '';
+  const authorName = tweet?.author?.name ?? 'You';
+  const isPending = !!tweet?.isPending;
 
-  document.querySelector('.tweet').style.visibility = 'visible';
+  const authorEl = document.querySelector('[tweet_author]');
+  if (authorEl) {
+    authorEl.innerHTML = '<a href="/p/' + authorId + '" style="color: var(--bs-body-color);">' + authorName + '</a>';
+  }
 
-  window.Auth.getCurrentUserId().then(function(userId) {
-    //console.log(userId); //
-    if(userId == tweet.author.id) {
-      document.querySelector("button.tweet-edit-btn").style.display = 'inline-block';
+  const createdAtEl = document.querySelector('[tweet_createdAt]');
+  if (createdAtEl) {
+    createdAtEl.textContent = ' · ' + formatPublishDate(tweet.createdAt);
+  }
+
+  const contentEl = document.querySelector('[data-tweet-content]');
+  if (contentEl) {
+    contentEl.textContent = tweet.content;
+  }
+
+  const likesEl = document.querySelector('[tweet_likes]');
+  if (likesEl) {
+    likesEl.textContent = tweet.likesCount || 0;
+  }
+
+  const likeBtn = document.querySelector('.tweet-like-btn');
+  if (likeBtn) {
+    likeBtn.setAttribute('data-tweet-id', tweet.id);
+    if (isPending) {
+      likeBtn.disabled = true;
+      likeBtn.style.pointerEvents = 'none';
+      likeBtn.style.opacity = '0.6';
+    } else {
+      likeBtn.disabled = false;
+      likeBtn.style.pointerEvents = '';
+      likeBtn.style.opacity = '';
     }
-  });
+  }
 
-  // Ensure liked state is applied to the newly rendered tweet button
-  window.Tweets?.applyLikedState?.();
+  const formContainer = document.querySelector('.tweet-form-container');
+  if (formContainer) {
+    formContainer.setAttribute('data-tweet-id', tweet.id);
+  }
+
+  const editBtn = document.querySelector('.tweet-edit-btn');
+  if (editBtn) {
+    editBtn.setAttribute('data-tweet-id', tweet.id);
+    editBtn.setAttribute('data-author-id', authorId);
+    if (isPending) {
+      editBtn.style.display = 'none';
+    }
+  }
+
+  const pendingBadge = document.querySelector('[data-tweet-pending-badge]');
+  if (pendingBadge) {
+    if (isPending) {
+      pendingBadge.classList.remove('d-none');
+    } else {
+      pendingBadge.classList.add('d-none');
+    }
+  }
+
+  const tweetContainer = document.querySelector('.tweet');
+  if (tweetContainer) {
+    tweetContainer.style.visibility = 'visible';
+    tweetContainer.style.display = 'block';
+  }
+
+  if (!isPending) {
+    window.Auth.getCurrentUserId().then(function (userId) {
+      if (userId && userId === authorId && editBtn) {
+        editBtn.style.display = 'inline-block';
+      }
+    });
+
+    window.Tweets?.applyLikedState?.();
+  }
 }

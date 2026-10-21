@@ -148,6 +148,12 @@ services:
     
     Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandlerInterface: '@Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler'
 
+    Twitter\Tweet\Application\UseCase\GetTweetModerationStatus\GetTweetModerationStatusCommandHandler:
+        arguments:
+            $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+
+    Twitter\Tweet\Application\UseCase\GetTweetModerationStatus\GetTweetModerationStatusCommandHandlerInterface: '@Twitter\Tweet\Application\UseCase\GetTweetModerationStatus\GetTweetModerationStatusCommandHandler'
+
     Twitter\Tweet\Application\UseCase\GetUserTweets\GetUserTweetsQueryHandler:
         arguments:
             $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
