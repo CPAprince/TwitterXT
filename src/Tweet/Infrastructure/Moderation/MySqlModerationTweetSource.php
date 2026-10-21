@@ -68,6 +68,51 @@ final readonly class MySqlModerationTweetSource implements ModerationTweetSource
     }
 
     /**
+     * @return list<ModerationTweetCandidate>
+     */
+    public function findPending(int $limit): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        $sql = '
+            SELECT BIN_TO_UUID(id) AS id, BIN_TO_UUID(user_id) AS user_id, content, moderation_version
+            FROM tweets
+            WHERE moderation_status = ?
+            ORDER BY created_at, id
+            LIMIT '.(int) $limit;
+
+        $rows = $this->connection->fetchAllAssociative(
+            $sql,
+            [Tweet::MODERATION_PENDING],
+            [ParameterType::INTEGER]
+        );
+
+        if ([] === $rows) {
+            return [];
+        }
+
+        $candidates = [];
+
+        foreach ($rows as $row) {
+            $tweetId = (string) $row['id'];
+            $userId = (string) ($row['user_id'] ?? '');
+            $content = (string) $row['content'];
+            $moderationVersion = (int) $row['moderation_version'];
+
+            $candidates[] = new ModerationTweetCandidate(
+                tweetId: $tweetId,
+                text: $content,
+                moderationVersion: $moderationVersion,
+                userId: $userId,
+            );
+        }
+
+        return $candidates;
+    }
+
+    /**
      * @param ModerationTweetCandidate[] $candidates
      * @param string[]                   $requestedIds
      *

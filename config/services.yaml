@@ -153,7 +153,6 @@ services:
     Twitter\Tweet\Application\Moderation\TweetModerationPolicy:
         arguments:
             $config: '@Twitter\Tweet\Application\Moderation\ModerationConfig'
-            $moderationQueue: '@Twitter\Tweet\Application\Moderation\ModerationQueueInterface'
 
     Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface: '@Twitter\Tweet\Application\Moderation\TweetModerationPolicy'
 
@@ -265,10 +264,6 @@ services:
         arguments:
             $redis: '@moderation.redis'
 
-    Twitter\Tweet\Infrastructure\Moderation\RedisModerationQueue:
-        arguments:
-            $redis: '@moderation.redis'
-
     Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory:
         arguments:
             $mode: '%moderation.mode%'
@@ -287,8 +282,6 @@ services:
 
             $demoApprovePercent: '%moderation.demo.approve_percent%'
 
-            $redisQueueKey: '%moderation.redis.queue_key%'
-            $redisFlushLockKey: '%moderation.redis.flush_lock_key%'
             $redisRateReqPrefix: '%moderation.redis.rate_req_prefix%'
             $redisRateTokPrefix: '%moderation.redis.rate_tok_prefix%'
             $redisRateReqDayPrefix: '%moderation.redis.rate_req_day_prefix%'
@@ -306,9 +299,6 @@ services:
     Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface:
         factory: [ '@Twitter\Tweet\Infrastructure\Moderation\TweetModerationProviderResolver', 'resolve' ]
 
-    Twitter\Tweet\Application\Moderation\ModerationQueueInterface:
-        alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationQueue
-
     Twitter\Tweet\Application\Moderation\ModerationTweetSourceInterface:
         alias: Twitter\Tweet\Infrastructure\Moderation\MySqlModerationTweetSource
 
@@ -323,12 +313,27 @@ services:
         arguments:
             $cacheTweets: '@cache.tweets'
 
+    Twitter\Tweet\Application\Moderation\ModerationFlushProcessor:
+        arguments:
+            $config: '@Twitter\Tweet\Application\Moderation\ModerationConfig'
+            $tweetSource: '@Twitter\Tweet\Application\Moderation\ModerationTweetSourceInterface'
+            $tokenEstimator: '@Twitter\Tweet\Application\Moderation\TweetTextTokenEstimator'
+            $batchBuilder: '@Twitter\Tweet\Application\Moderation\ModerationBatchBuilder'
+            $rateLimiter: '@Twitter\Tweet\Application\Moderation\ModerationRateLimiterInterface'
+            $provider: '@Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface'
+            $statusUpdater: '@Twitter\Tweet\Application\Moderation\ModerationStatusUpdaterInterface'
+            $cacheInvalidator: '@Twitter\Tweet\Application\Moderation\ModeratedTweetsCacheInvalidatorInterface'
+
+    Twitter\Tweet\Application\Moderation\ModerationFlushProcessorInterface: '@Twitter\Tweet\Application\Moderation\ModerationFlushProcessor'
+
     Twitter\Tweet\UI\CLI\TestModerationProviderCommand:
         tags: [ 'console.command' ]
 
     Twitter\Tweet\UI\CLI\ModerationFlushWorkerCommand:
         tags: [ 'console.command' ]
         arguments:
+            $config: '@Twitter\Tweet\Application\Moderation\ModerationConfig'
+            $processor: '@Twitter\Tweet\Application\Moderation\ModerationFlushProcessorInterface'
             $lockFactory: '@lock.factory'
             $connection: '@doctrine.dbal.default_connection'
 

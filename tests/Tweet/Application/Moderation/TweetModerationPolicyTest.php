@@ -8,11 +8,9 @@ use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twitter\Tweet\Application\Moderation\ModerationConfig;
 use Twitter\Tweet\Application\Moderation\ModerationMode;
-use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
 use Twitter\Tweet\Application\Moderation\TweetModerationPolicy;
 use Twitter\Tweet\Domain\Tweet\Model\Tweet;
 
@@ -20,24 +18,13 @@ use Twitter\Tweet\Domain\Tweet\Model\Tweet;
 #[CoversClass(TweetModerationPolicy::class)]
 final class TweetModerationPolicyTest extends TestCase
 {
-    private ModerationQueueInterface&MockObject $moderationQueue;
-
-    protected function setUp(): void
-    {
-        $this->moderationQueue = $this->createMock(ModerationQueueInterface::class);
-    }
-
     #[Test]
-    public function onContentWrittenApprovesSynchronouslyAndDoesNotEnqueueInBypassMode(): void
+    public function onContentWrittenApprovesSynchronouslyInBypassMode(): void
     {
         $config = $this->createConfig(ModerationMode::BYPASS);
-        $policy = new TweetModerationPolicy($config, $this->moderationQueue);
+        $policy = new TweetModerationPolicy($config);
 
         $tweet = Tweet::create('019b5f3f-d110-7908-9177-5df439942a8b', 'Bypass test tweet');
-
-        $this->moderationQueue
-            ->expects(self::never())
-            ->method('enqueue');
 
         $policy->onContentWritten($tweet);
 
@@ -46,17 +33,12 @@ final class TweetModerationPolicyTest extends TestCase
     }
 
     #[Test]
-    public function onContentWrittenEnqueuesAndKeepsPendingInDemoMode(): void
+    public function onContentWrittenKeepsPendingInDemoMode(): void
     {
         $config = $this->createConfig(ModerationMode::DEMO);
-        $policy = new TweetModerationPolicy($config, $this->moderationQueue);
+        $policy = new TweetModerationPolicy($config);
 
         $tweet = Tweet::create('019b5f3f-d110-7908-9177-5df439942a8b', 'Demo test tweet');
-
-        $this->moderationQueue
-            ->expects(self::once())
-            ->method('enqueue')
-            ->with($tweet->id());
 
         $policy->onContentWritten($tweet);
 
@@ -65,17 +47,12 @@ final class TweetModerationPolicyTest extends TestCase
     }
 
     #[Test]
-    public function onContentWrittenEnqueuesAndKeepsPendingInLiveMode(): void
+    public function onContentWrittenKeepsPendingInLiveMode(): void
     {
         $config = $this->createConfig(ModerationMode::LIVE);
-        $policy = new TweetModerationPolicy($config, $this->moderationQueue);
+        $policy = new TweetModerationPolicy($config);
 
         $tweet = Tweet::create('019b5f3f-d110-7908-9177-5df439942a8b', 'Live test tweet');
-
-        $this->moderationQueue
-            ->expects(self::once())
-            ->method('enqueue')
-            ->with($tweet->id());
 
         $policy->onContentWritten($tweet);
 
@@ -98,8 +75,6 @@ final class TweetModerationPolicyTest extends TestCase
             limitTpm: 9000,
             limitRpd: 9800,
             demoApprovePercent: 95,
-            redisQueueKey: 'moderation:tweet_queue',
-            redisFlushLockKey: 'moderation:flush_lock',
             redisRateReqPrefix: 'moderation:rate:req:',
             redisRateTokPrefix: 'moderation:rate:tok:',
             redisRateReqDayPrefix: 'moderation:rate:reqday:',

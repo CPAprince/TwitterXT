@@ -103,8 +103,6 @@ final class DemoTweetModerationProviderTest extends TestCase
             limitTpm: 100_000,
             limitRpd: 1_000,
             demoApprovePercent: $approvePercent,
-            redisQueueKey: 'moderation:queue',
-            redisFlushLockKey: 'moderation:lock',
             redisRateReqPrefix: 'moderation:rate:req:',
             redisRateTokPrefix: 'moderation:rate:tok:',
             redisRateReqDayPrefix: 'moderation:rate:day:',

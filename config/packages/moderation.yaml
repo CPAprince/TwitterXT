@@ -25,9 +25,7 @@ parameters:
     # demo mode settings
     moderation.demo.approve_percent: '%env(int:MODERATION_DEMO_APPROVE_PERCENT)%'
     
-    # redis keys / prefixes
-    moderation.redis.queue_key: 'moderation:tweet_queue'
-    moderation.redis.flush_lock_key: 'moderation:flush_lock'
+    # redis prefixes for rate limiter
     moderation.redis.rate_req_prefix: 'moderation:rate:req:'
     moderation.redis.rate_tok_prefix: 'moderation:rate:tok:'
     moderation.redis.rate_req_day_prefix: 'moderation:rate:reqday:'

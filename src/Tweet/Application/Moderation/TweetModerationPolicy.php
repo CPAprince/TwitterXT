@@ -11,7 +11,6 @@ final readonly class TweetModerationPolicy implements TweetModerationPolicyInter
 {
     public function __construct(
         private ModerationConfig $config,
-        private ModerationQueueInterface $moderationQueue,
     ) {}
 
     #[Override]
@@ -19,10 +18,6 @@ final readonly class TweetModerationPolicy implements TweetModerationPolicyInter
     {
         if ($this->config->isBypass()) {
             $tweet->approveModeration();
-
-            return;
         }
-
-        $this->moderationQueue->enqueue($tweet->id());
     }
 }

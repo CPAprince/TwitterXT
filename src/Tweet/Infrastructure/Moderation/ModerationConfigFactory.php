@@ -26,8 +26,6 @@ final readonly class ModerationConfigFactory
 
         private int $demoApprovePercent,
 
-        private string $redisQueueKey,
-        private string $redisFlushLockKey,
         private string $redisRateReqPrefix,
         private string $redisRateTokPrefix,
         private string $redisRateReqDayPrefix,
@@ -59,8 +57,6 @@ final readonly class ModerationConfigFactory
 
             demoApprovePercent: $this->demoApprovePercent,
 
-            redisQueueKey: $this->redisQueueKey,
-            redisFlushLockKey: $this->redisFlushLockKey,
             redisRateReqPrefix: $this->redisRateReqPrefix,
             redisRateTokPrefix: $this->redisRateTokPrefix,
             redisRateReqDayPrefix: $this->redisRateReqDayPrefix,

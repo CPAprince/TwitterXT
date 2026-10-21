@@ -25,8 +25,6 @@ final readonly class ModerationConfig
 
         public int $demoApprovePercent,
 
-        public string $redisQueueKey,
-        public string $redisFlushLockKey,
         public string $redisRateReqPrefix,
         public string $redisRateTokPrefix,
         public string $redisRateReqDayPrefix,
@@ -77,10 +75,6 @@ final readonly class ModerationConfig
 
         if ($this->demoApprovePercent < 0 || $this->demoApprovePercent > 100) {
             throw new InvalidArgumentException('moderation.demo.approve_percent must be between 0 and 100.');
-        }
-
-        if ('' === $this->redisQueueKey || '' === $this->redisFlushLockKey) {
-            throw new InvalidArgumentException('Redis moderation keys must not be empty.');
         }
 
         if ($this->workerIdleSleepMs <= 0) {

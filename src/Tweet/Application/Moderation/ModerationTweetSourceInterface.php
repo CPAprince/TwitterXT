@@ -12,4 +12,9 @@ interface ModerationTweetSourceInterface
      * @return ModerationTweetCandidate[]
      */
     public function findByIds(array $tweetIds): array;
+
+    /**
+     * @return list<ModerationTweetCandidate>
+     */
+    public function findPending(int $limit): array;
 }
