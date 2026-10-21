@@ -6,6 +6,7 @@ namespace Twitter\Tweet\Infrastructure\Moderation;
 
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
+use OpenAI\Exceptions\RateLimitException;
 use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
@@ -55,10 +56,15 @@ final class OpenAiTweetModerationProvider implements TweetModerationProviderInte
 
         $client = $this->getClient();
 
-        $response = $client->moderations()->create([
-            'model' => $this->config->model,
-            'input' => $inputs,
-        ]);
+        try {
+            $response = $client->moderations()->create([
+                'model' => $this->config->model,
+                'input' => $inputs,
+            ]);
+        } catch (RateLimitException $e) {
+            $retryAfter = (int) ($e->response->getHeaderLine('Retry-After') ?: $e->response->getHeaderLine('retry-after') ?: '0');
+            throw new RuntimeException($retryAfter > 0 ? sprintf('OpenAI rate limit exceeded (Retry-After: %d seconds).', $retryAfter) : 'OpenAI rate limit exceeded.', 429, $e);
+        }
 
         $results = $response->results;
 
@@ -72,13 +78,28 @@ final class OpenAiTweetModerationProvider implements TweetModerationProviderInte
             $result = $results[$index];
 
             $flagged = $result->flagged ?? false;
+            /** @var list<string> $flaggedCategories */
+            $flaggedCategories = [];
+
+            foreach ($result->categories as $categoryName => $categoryData) {
+                if ($categoryData->violated) {
+                    $flaggedCategories[] = (string) $categoryName;
+                }
+            }
+
+            $reason = null;
+            if ($flagged) {
+                $reason = [] !== $flaggedCategories
+                    ? 'Flagged: '.implode(', ', $flaggedCategories)
+                    : 'Rejected by OpenAI moderation.';
+            }
 
             $decisions[] = new ModerationDecision(
                 tweetId: $item->tweetId,
                 approved: !$flagged,
                 moderationVersion: $item->moderationVersion,
-                reason: $flagged ? 'Rejected by OpenAI moderation.' : null,
-                categories: [],
+                reason: $reason,
+                categories: $flaggedCategories,
                 userId: $item->userId,
             );
         }

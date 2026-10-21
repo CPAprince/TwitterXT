@@ -10,17 +10,20 @@ parameters:
     moderation.api_key: '%env(OPENAI_API_KEY)%'
     
     # batching policy
-    moderation.batch.max_items: 25
-    moderation.batch.soft_token_cap: 1800
-    moderation.batch.hard_token_cap: 2000
-    moderation.batch.flush_interval_ms: 300
+    moderation.batch.max_items: '%env(int:MODERATION_BATCH_MAX_ITEMS)%'
+    moderation.batch.soft_token_cap: '%env(int:MODERATION_BATCH_SOFT_TOKEN_CAP)%'
+    moderation.batch.hard_token_cap: '%env(int:MODERATION_BATCH_HARD_TOKEN_CAP)%'
+    moderation.batch.flush_interval_ms: '%env(int:MODERATION_BATCH_FLUSH_INTERVAL_MS)%'
     
     # runtime rate limits for live moderation
-    # provided limits for Tier1 Account in OpenAI API. 
-    # Free tier has lower limit and Tier2-5 got higher limits. 
-    moderation.limits.rpm: 490
-    moderation.limits.tpm: 9000
-    moderation.limits.rpd: 9800
+    # OpenAI Tier limits for omni-moderation-latest:
+    # Free:  240 RPM /  9,500 TPM / 4,900 RPD (with ~5% margin below 250 / 10k / 5k)
+    # Build: 475 RPM / 19,000 TPM /     0 RPD (0 = no daily limit; default tier)
+    # Launch: 1900 RPM / 240,000 TPM /     0 RPD
+    # Grow:   4750 RPM / 480,000 TPM /     0 RPD
+    moderation.limits.rpm: '%env(int:MODERATION_LIMIT_RPM)%'
+    moderation.limits.tpm: '%env(int:MODERATION_LIMIT_TPM)%'
+    moderation.limits.rpd: '%env(int:MODERATION_LIMIT_RPD)%'
     
     # demo mode settings
     moderation.demo.approve_percent: '%env(int:MODERATION_DEMO_APPROVE_PERCENT)%'

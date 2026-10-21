@@ -193,4 +193,24 @@ final class ModerationFlushProcessorTest extends TestCase
         $report3 = $this->processor->processOnce();
         self::assertSame(['poison-tweet'], $report3->poisonTweetIds);
     }
+
+    #[Test]
+    public function doesNotTreat429RateLimitAsPoisonPill(): void
+    {
+        $candidate = new ModerationTweetCandidate('tweet-1', 'Valid text', 1, 'user-1');
+        $this->tweetSource->method('findPending')->willReturn([$candidate]);
+        $this->rateLimiter->method('reserveCapacity')->willReturn(ModerationRateLimitResult::allowed());
+
+        $this->provider->method('moderateBatch')
+            ->willThrowException(new RuntimeException('OpenAI rate limit exceeded (Retry-After: 5 seconds).', 429));
+
+        $this->statusUpdater->expects(self::never())
+            ->method('markFailed');
+
+        for ($i = 0; $i < 5; ++$i) {
+            $report = $this->processor->processOnce();
+            self::assertSame('OpenAI rate limit exceeded (Retry-After: 5 seconds).', $report->errorMessage);
+            self::assertSame([], $report->poisonTweetIds);
+        }
+    }
 }

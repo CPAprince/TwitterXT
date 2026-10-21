@@ -52,7 +52,8 @@ final class ModerationFlushProcessor implements ModerationFlushProcessorInterfac
         try {
             $decisions = $this->provider->moderateBatch($batch->items);
         } catch (Throwable $e) {
-            $poisonIds = $this->handleBatchFailure($batch);
+            $isTransientRateLimit = 429 === $e->getCode();
+            $poisonIds = $isTransientRateLimit ? [] : $this->handleBatchFailure($batch);
 
             return ModerationFlushReport::failure($e->getMessage(), $poisonIds);
         }

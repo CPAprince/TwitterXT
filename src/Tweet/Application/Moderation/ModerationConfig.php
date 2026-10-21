@@ -69,8 +69,8 @@ final readonly class ModerationConfig
             throw new InvalidArgumentException('moderation.batch.flush_interval_ms must be greater than 0.');
         }
 
-        if ($this->limitRpm <= 0 || $this->limitTpm <= 0 || $this->limitRpd <= 0) {
-            throw new InvalidArgumentException('Moderation limits must be greater than 0.');
+        if ($this->limitRpm <= 0 || $this->limitTpm <= 0 || $this->limitRpd < 0) {
+            throw new InvalidArgumentException('Moderation RPM and TPM limits must be greater than 0, and RPD must be greater than or equal to 0.');
         }
 
         if ($this->demoApprovePercent < 0 || $this->demoApprovePercent > 100) {

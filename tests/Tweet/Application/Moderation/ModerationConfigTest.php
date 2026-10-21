@@ -53,7 +53,7 @@ final class ModerationConfigTest extends TestCase
             'batchFlushIntervalMs zero' => [['batchFlushIntervalMs' => 0]],
             'limitRpm zero' => [['limitRpm' => 0]],
             'limitTpm zero' => [['limitTpm' => 0]],
-            'limitRpd zero' => [['limitRpd' => 0]],
+            'limitRpd negative' => [['limitRpd' => -1]],
             'demoApprovePercent negative' => [['demoApprovePercent' => -1]],
             'demoApprovePercent above 100' => [['demoApprovePercent' => 101]],
             'workerIdleSleepMs zero' => [['workerIdleSleepMs' => 0]],
@@ -125,6 +125,14 @@ final class ModerationConfigTest extends TestCase
         $config = $this->makeConfig(['apiKey' => 'sk-test-key']);
 
         self::assertTrue($config->hasApiKey());
+    }
+
+    #[Test]
+    public function allowsZeroLimitRpdForUnlimitedDailyLimit(): void
+    {
+        $config = $this->makeConfig(['limitRpd' => 0]);
+
+        self::assertSame(0, $config->limitRpd);
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

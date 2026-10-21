@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Twitter\Tests\Tweet\Infrastructure\Moderation;
 
+use Nyholm\Psr7\Response;
+use OpenAI\Exceptions\RateLimitException;
 use OpenAI\Responses\Moderations\CreateResponse;
 use OpenAI\Testing\ClientFake;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -127,6 +129,37 @@ final class OpenAiTweetModerationProviderTest extends TestCase
         self::assertSame('t-third', $decisions[2]->tweetId);
     }
 
+    #[Test]
+    public function mapsRateLimitExceptionWithRetryAfterHeaderToRuntimeException(): void
+    {
+        $response = new Response(429, ['Retry-After' => '15']);
+        $clientFake = new ClientFake([new RateLimitException($response)]);
+        $provider = new OpenAiTweetModerationProvider($this->makeConfig(apiKey: null), $clientFake);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(429);
+        $this->expectExceptionMessage('OpenAI rate limit exceeded (Retry-After: 15 seconds).');
+
+        $provider->moderateBatch([new ModerationBatchItem('tweet-1', 'Test', 2, 1)]);
+    }
+
+    #[Test]
+    public function extractsFlaggedCategoriesAndSetsReason(): void
+    {
+        $provider = $this->makeProviderWithFakeClient(
+            flagged: true,
+            categories: ['hate' => true, 'violence' => true],
+        );
+        $items = [new ModerationBatchItem('tweet-2', 'Harmful content', 4, 1)];
+
+        $decisions = $provider->moderateBatch($items);
+
+        self::assertCount(1, $decisions);
+        self::assertFalse($decisions[0]->approved);
+        self::assertSame(['hate', 'violence'], $decisions[0]->categories);
+        self::assertSame('Flagged: hate, violence', $decisions[0]->reason);
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────────
 
     /**
@@ -135,19 +168,27 @@ final class OpenAiTweetModerationProviderTest extends TestCase
      * When $responseCount is null it defaults to $itemCount (matching response).
      *
      * Uses OpenAI\Testing\ClientFake so the property type (ClientContract) is satisfied.
+     *
+     * @param array<string, bool> $categories
      */
     private function makeProviderWithFakeClient(
         bool $flagged,
         int $itemCount = 1,
         ?int $responseCount = null,
+        array $categories = [],
     ): OpenAiTweetModerationProvider {
         $responseCount ??= $itemCount;
+
+        $categoryScores = [];
+        foreach ($categories as $k => $v) {
+            $categoryScores[$k] = $v ? 0.99 : 0.01;
+        }
 
         // Build minimal result attributes – categories/scores empty, only flagged matters
         $resultAttributes = array_fill(
             0,
             $responseCount,
-            ['categories' => [], 'category_scores' => [], 'flagged' => $flagged]
+            ['categories' => $categories, 'category_scores' => $categoryScores, 'flagged' => $flagged]
         );
 
         $response = CreateResponse::from(

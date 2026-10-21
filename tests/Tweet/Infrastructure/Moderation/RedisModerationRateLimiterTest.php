@@ -151,9 +151,30 @@ final class RedisModerationRateLimiterTest extends TestCase
         $this->rateLimiter->reserveCapacity(100);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
+    #[Test]
+    public function passesZeroRpdLimitToRedisEvalWhenDailyLimitDisabled(): void
+    {
+        $limiter = new RedisModerationRateLimiter($this->redis, $this->makeConfig(limitRpd: 0));
+
+        $this->redis->expects(self::once())
+            ->method('eval')
+            ->with(
+                self::isType('string'),
+                self::callback(function (array $args): bool {
+                    return 0 === $args[5];
+                }),
+                3
+            )
+            ->willReturn([1, 'allowed']);
+
+        $result = $limiter->reserveCapacity(50);
+        self::assertTrue($result->allowed);
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────────
 
-    private function makeConfig(): ModerationConfig
+    private function makeConfig(int $limitRpd = 1_000): ModerationConfig
     {
         return new ModerationConfig(
             mode: ModerationMode::LIVE,
@@ -166,7 +187,7 @@ final class RedisModerationRateLimiterTest extends TestCase
             batchFlushIntervalMs: 500,
             limitRpm: 60,
             limitTpm: 100_000,
-            limitRpd: 1_000,
+            limitRpd: $limitRpd,
             demoApprovePercent: 80,
             redisRateReqPrefix: 'moderation:rate:req:',
             redisRateTokPrefix: 'moderation:rate:tok:',

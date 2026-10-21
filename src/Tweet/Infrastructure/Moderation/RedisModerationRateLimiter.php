@@ -41,13 +41,12 @@ if tokMinute + batchTokens > tpmLimit then
     return {0, 'tpm_exceeded'}
 end
 
-if reqDay + 1 > rpdLimit then
+if rpdLimit > 0 and reqDay + 1 > rpdLimit then
     return {0, 'rpd_exceeded'}
 end
 
 reqMinute = redis.call('INCRBY', reqMinuteKey, 1)
 tokMinute = redis.call('INCRBY', tokMinuteKey, batchTokens)
-reqDay = redis.call('INCRBY', reqDayKey, 1)
 
 if reqMinute == 1 then
     redis.call('EXPIRE', reqMinuteKey, reqMinuteTtl)
@@ -57,8 +56,11 @@ if tokMinute == batchTokens then
     redis.call('EXPIRE', tokMinuteKey, tokMinuteTtl)
 end
 
-if reqDay == 1 then
-    redis.call('EXPIRE', reqDayKey, reqDayTtl)
+if rpdLimit > 0 then
+    reqDay = redis.call('INCRBY', reqDayKey, 1)
+    if reqDay == 1 then
+        redis.call('EXPIRE', reqDayKey, reqDayTtl)
+    end
 end
 
 return {1, 'allowed'}

@@ -146,7 +146,16 @@ final class ModerationFlushWorkerCommand extends Command implements SignalableCo
                             implode(', ', $report->poisonTweetIds),
                         ));
                     }
-                    sleep($errorBackoff);
+
+                    $sleepSeconds = $errorBackoff;
+                    if (preg_match('/Retry-After:\s*(\d+)/i', $report->errorMessage, $matches)) {
+                        $retryAfter = (int) $matches[1];
+                        if ($retryAfter > 0) {
+                            $sleepSeconds = min(self::MAX_ERROR_BACKOFF_SECONDS, $retryAfter);
+                        }
+                    }
+
+                    sleep($sleepSeconds);
                     $errorBackoff = min(self::MAX_ERROR_BACKOFF_SECONDS, $errorBackoff * 2);
                     continue;
                 }
