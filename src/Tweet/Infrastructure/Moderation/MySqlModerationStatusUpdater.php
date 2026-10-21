@@ -31,7 +31,8 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
         $sql = '
         UPDATE tweets
         SET moderation_status = ?,
-            moderated_at = UTC_TIMESTAMP()
+            moderated_at = UTC_TIMESTAMP(),
+            moderation_reason = ?
         WHERE id = ?
           AND moderation_version = ?
           AND moderation_status = ?
@@ -46,12 +47,14 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
                     $decision->approved
                         ? Tweet::MODERATION_APPROVED
                         : Tweet::MODERATION_REJECTED,
+                    $decision->reason,
                     UuidBinaryConverter::toBytes($decision->tweetId),
                     $decision->moderationVersion,
                     Tweet::MODERATION_PENDING,
                 ],
                 [
                     ParameterType::INTEGER,
+                    null === $decision->reason ? ParameterType::NULL : ParameterType::STRING,
                     ParameterType::BINARY,
                     ParameterType::INTEGER,
                     ParameterType::INTEGER,
@@ -78,7 +81,8 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
         $sql = '
             UPDATE tweets
             SET moderation_status = ?,
-                moderated_at = UTC_TIMESTAMP()
+                moderated_at = UTC_TIMESTAMP(),
+                moderation_reason = ?
             WHERE id = ?
               AND moderation_status = ?
         ';
@@ -88,11 +92,13 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
                 $sql,
                 [
                     Tweet::MODERATION_FAILED,
+                    'Failed after multiple moderation attempts.',
                     UuidBinaryConverter::toBytes($tweetId),
                     Tweet::MODERATION_PENDING,
                 ],
                 [
                     ParameterType::INTEGER,
+                    ParameterType::STRING,
                     ParameterType::BINARY,
                     ParameterType::INTEGER,
                 ]

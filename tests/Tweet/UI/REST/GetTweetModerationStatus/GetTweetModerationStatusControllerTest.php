@@ -63,4 +63,28 @@ final class GetTweetModerationStatusControllerTest extends TestCase
         self::assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         self::assertTrue($response->headers->hasCacheControlDirective('private'));
     }
+
+    #[Test]
+    public function invokeReturnsModerationStatusWithReasonWhenPresent(): void
+    {
+        $user = User::create(Email::fromString('author@example.com'), PasswordHash::fromPlainPassword('Valid123#'));
+        $tweetId = '019b5f3f-d110-7908-9177-5df439942a8b';
+
+        $this->handler
+            ->expects(self::once())
+            ->method('handle')
+            ->willReturn(new GetTweetModerationStatusResponse($tweetId, 'rejected', 'Flagged: hate'));
+
+        $response = ($this->controller)($tweetId, $user);
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertJsonStringEqualsJsonString(
+            json_encode([
+                'tweetId' => $tweetId,
+                'status' => 'rejected',
+                'reason' => 'Flagged: hate',
+            ], JSON_THROW_ON_ERROR),
+            (string) $response->getContent()
+        );
+    }
 }

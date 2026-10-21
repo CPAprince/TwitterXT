@@ -23,6 +23,8 @@ final class Tweet
 
     private ?DateTimeImmutable $moderatedAt = null;
 
+    private ?string $moderationReason = null;
+
     private function __construct(
         private readonly string $id,
         private readonly string $userId,
@@ -115,22 +117,30 @@ final class Tweet
         return $this->moderatedAt;
     }
 
+    public function moderationReason(): ?string
+    {
+        return $this->moderationReason;
+    }
+
     public function resetModeration(): void
     {
         $this->moderationStatus = self::MODERATION_PENDING;
         $this->moderatedAt = null;
+        $this->moderationReason = null;
     }
 
     public function approveModeration(): void
     {
         $this->moderationStatus = self::MODERATION_APPROVED;
         $this->moderatedAt = new DateTimeImmutable();
+        $this->moderationReason = null;
     }
 
-    public function rejectModeration(): void
+    public function rejectModeration(?string $reason = null): void
     {
         $this->moderationStatus = self::MODERATION_REJECTED;
         $this->moderatedAt = new DateTimeImmutable();
+        $this->moderationReason = $reason;
     }
 
     public function moderationVersion(): int

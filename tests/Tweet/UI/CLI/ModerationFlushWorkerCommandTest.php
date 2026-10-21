@@ -42,7 +42,7 @@ final class ModerationFlushWorkerCommandTest extends TestCase
             batchMaxItems: 10,
             batchSoftTokenCap: 1_000,
             batchHardTokenCap: 2_000,
-            batchFlushIntervalMs: 500,
+            batchFlushIntervalMs: 1,
             limitRpm: 60,
             limitTpm: 100_000,
             limitRpd: 1_000,

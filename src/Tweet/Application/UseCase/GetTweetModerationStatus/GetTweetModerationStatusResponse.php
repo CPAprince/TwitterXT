@@ -9,5 +9,6 @@ final readonly class GetTweetModerationStatusResponse
     public function __construct(
         public string $tweetId,
         public string $status,
+        public ?string $reason = null,
     ) {}
 }

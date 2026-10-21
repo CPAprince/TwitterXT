@@ -73,7 +73,7 @@ final class GetTweetModerationStatusCommandHandlerTest extends TestCase
     {
         $authorId = '019b5f3f-d110-7908-9177-5df439942a8b';
         $tweet = Tweet::create($authorId, 'Rejected tweet');
-        $tweet->rejectModeration();
+        $tweet->rejectModeration('Flagged: hate');
         $tweetId = $tweet->id();
 
         $this->tweetRepository
@@ -86,6 +86,7 @@ final class GetTweetModerationStatusCommandHandlerTest extends TestCase
 
         self::assertSame($tweetId, $result->tweetId);
         self::assertSame('rejected', $result->status);
+        self::assertSame('Flagged: hate', $result->reason);
     }
 
     #[Test]

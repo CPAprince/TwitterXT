@@ -53,8 +53,8 @@ final class MySqlModerationStatusUpdaterTest extends TestCase
                 self::stringContains('moderation_status = ?'),
                 self::callback(function (array $params) use ($version): bool {
                     return Tweet::MODERATION_APPROVED === $params[0]
-                        && $params[2] === $version
-                        && Tweet::MODERATION_PENDING === $params[3];
+                        && $params[3] === $version
+                        && Tweet::MODERATION_PENDING === $params[4];
                 }),
             );
 
@@ -76,8 +76,8 @@ final class MySqlModerationStatusUpdaterTest extends TestCase
                 self::stringContains('moderation_status = ?'),
                 self::callback(function (array $params) use ($version): bool {
                     return Tweet::MODERATION_REJECTED === $params[0]
-                        && $params[2] === $version
-                        && Tweet::MODERATION_PENDING === $params[3];
+                        && $params[3] === $version
+                        && Tweet::MODERATION_PENDING === $params[4];
                 }),
             );
 
@@ -147,8 +147,47 @@ final class MySqlModerationStatusUpdaterTest extends TestCase
 
         $this->updater->apply([new ModerationDecision('019b5f3f-d110-7908-9177-5df439942a8b', true, $version)]);
 
-        // Params order: [targetStatus, binaryId, moderationVersion, pendingStatus]
-        self::assertSame($version, $captured[2]);
+        // Params order: [targetStatus, reason, binaryId, moderationVersion, pendingStatus]
+        self::assertSame($version, $captured[3]);
+    }
+
+    #[Test]
+    public function applyPassesModerationReasonToStatement(): void
+    {
+        $tweetId = '019b5f3f-d110-7908-9177-5df439942a8b';
+        $reason = 'Flagged: hate';
+
+        $this->connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with(
+                self::stringContains('moderation_reason = ?'),
+                self::callback(function (array $params) use ($reason): bool {
+                    return $params[1] === $reason;
+                }),
+            );
+
+        $this->updater->apply([new ModerationDecision($tweetId, false, 1, reason: $reason)]);
+    }
+
+    #[Test]
+    public function markFailedUpdatesStatusAndReason(): void
+    {
+        $tweetId = '019b5f3f-d110-7908-9177-5df439942a8b';
+
+        $this->connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with(
+                self::stringContains('moderation_status = ?'),
+                self::callback(function (array $params): bool {
+                    return Tweet::MODERATION_FAILED === $params[0]
+                        && 'Failed after multiple moderation attempts.' === $params[1]
+                        && Tweet::MODERATION_PENDING === $params[3];
+                }),
+            );
+
+        $this->updater->markFailed([$tweetId]);
     }
 
     #[Test]

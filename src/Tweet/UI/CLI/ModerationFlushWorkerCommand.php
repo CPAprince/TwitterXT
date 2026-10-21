@@ -185,7 +185,7 @@ final class ModerationFlushWorkerCommand extends Command implements SignalableCo
                     if ($report->isFullBatch) {
                         usleep(0);
                     } else {
-                        usleep($this->config->workerIdleSleepMs * 1000);
+                        usleep($this->config->batchFlushIntervalMs * 1000);
                     }
                 } else {
                     usleep($this->config->workerIdleSleepMs * 1000);

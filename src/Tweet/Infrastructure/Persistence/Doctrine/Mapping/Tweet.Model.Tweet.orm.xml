@@ -39,6 +39,7 @@
                 <option name="default">1</option>
             </options>
         </field>
+        <field name="moderationReason" column="moderation_reason" type="string" length="255" nullable="true"/>
 
     </entity>
 

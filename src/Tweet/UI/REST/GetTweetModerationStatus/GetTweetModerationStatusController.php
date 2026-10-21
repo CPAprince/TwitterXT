@@ -38,10 +38,16 @@ final readonly class GetTweetModerationStatusController
             new GetTweetModerationStatusCommand($tweetId, $authUser->id())
         );
 
-        $jsonResponse = new JsonResponse([
+        $data = [
             'tweetId' => $response->tweetId,
             'status' => $response->status,
-        ], Response::HTTP_OK);
+        ];
+
+        if (null !== $response->reason) {
+            $data['reason'] = $response->reason;
+        }
+
+        $jsonResponse = new JsonResponse($data, Response::HTTP_OK);
 
         $jsonResponse->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 

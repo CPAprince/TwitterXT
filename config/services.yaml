@@ -83,9 +83,12 @@ services:
         arguments:
             $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
     
+    Twitter\Tweet\Application\Port\TweetReadPortInterface: '@Twitter\Tweet\Infrastructure\Adapter\TweetReadAdapter'
+
     Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler:
         arguments:
             $likeRepository: '@Twitter\Like\Domain\Like\Model\LikeRepository'
+            $tweetReadPort: '@Twitter\Tweet\Application\Port\TweetReadPortInterface'
             
     Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandlerInterface: '@Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler'
     

@@ -38,6 +38,7 @@ final readonly class GetTweetModerationStatusCommandHandler implements GetTweetM
         return new GetTweetModerationStatusResponse(
             tweetId: $tweet->id(),
             status: $status,
+            reason: $tweet->moderationReason(),
         );
     }
 }

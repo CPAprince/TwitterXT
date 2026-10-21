@@ -14,7 +14,7 @@ use Twitter\Tweet\Application\Moderation\ModerationConfig;
 use Twitter\Tweet\Application\Moderation\TweetModerationProviderInterface;
 
 #[AsCommand(
-    name: 'app:test-moderation-provider',
+    name: 'app:moderation:test-provider',
     description: 'Test moderation provider resolution and batch moderation'
 )]
 final class TestModerationProviderCommand extends Command
