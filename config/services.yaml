@@ -83,6 +83,10 @@ services:
         arguments:
             $profileRepository: '@Twitter\Profile\Domain\Profile\Model\ProfileRepository'
     
+    Twitter\Tweet\Infrastructure\Adapter\TweetReadAdapter:
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+
     Twitter\Tweet\Application\Port\TweetReadPortInterface: '@Twitter\Tweet\Infrastructure\Adapter\TweetReadAdapter'
 
     Twitter\Like\Application\UseCase\ToggleLike\ToggleLikeCommandHandler:
