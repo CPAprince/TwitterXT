@@ -169,7 +169,6 @@ final class RedisModerationWorkerLockTest extends TestCase
     private function makeConfig(): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: true,
             mode: ModerationMode::LIVE,
             provider: 'openai',
             model: 'omni-moderation-latest',

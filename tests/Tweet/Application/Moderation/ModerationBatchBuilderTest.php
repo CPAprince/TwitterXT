@@ -141,7 +141,6 @@ final class ModerationBatchBuilderTest extends TestCase
     private function makeConfig(int $maxItems = 10, int $softCap = 100, int $hardCap = 200): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: true,
             mode: ModerationMode::LIVE,
             provider: 'openai',
             model: 'omni-moderation-latest',

@@ -1,6 +1,4 @@
 parameters:
-    moderation.enabled: true
-    
     # live   - live request to OpenAI
     # demo   - simulate moderation without requests to OpenAI API
     # bypass - moderation turned off, all approves automatically

@@ -91,7 +91,6 @@ final class DemoTweetModerationProviderTest extends TestCase
     private function makeConfig(int $approvePercent): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: true,
             mode: ModerationMode::DEMO,
             provider: 'demo',
             model: 'demo',

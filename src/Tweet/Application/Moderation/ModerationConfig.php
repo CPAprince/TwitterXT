@@ -9,7 +9,6 @@ use InvalidArgumentException;
 final readonly class ModerationConfig
 {
     public function __construct(
-        public bool $enabled,
         public ModerationMode $mode,
         public string $provider,
         public string $model,
@@ -96,22 +95,27 @@ final readonly class ModerationConfig
 
     public function isEnabled(): bool
     {
-        return $this->enabled;
+        return !$this->mode->isBypass();
     }
 
     public function requiresLiveApiCall(): bool
     {
-        return $this->enabled && $this->mode->isLive();
+        return $this->mode->isLive();
     }
 
     public function usesDemoMode(): bool
     {
-        return $this->enabled && $this->mode->isDemo();
+        return $this->mode->isDemo();
     }
 
     public function usesBypassMode(): bool
     {
-        return !$this->enabled || $this->mode->isBypass();
+        return $this->mode->isBypass();
+    }
+
+    public function isBypass(): bool
+    {
+        return $this->mode->isBypass();
     }
 
     public function hasApiKey(): bool

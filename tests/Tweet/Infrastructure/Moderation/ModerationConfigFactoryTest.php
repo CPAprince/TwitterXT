@@ -25,7 +25,7 @@ final class ModerationConfigFactoryTest extends TestCase
         $config = $factory->create();
 
         // Assert
-        self::assertTrue($config->enabled);
+        self::assertTrue($config->isEnabled());
         self::assertSame(ModerationMode::LIVE, $config->mode);
         self::assertSame('openai', $config->provider);
         self::assertSame('sk-test-key', $config->apiKey);
@@ -63,7 +63,6 @@ final class ModerationConfigFactoryTest extends TestCase
         ?string $apiKey = 'sk-test-key',
     ): ModerationConfigFactory {
         return new ModerationConfigFactory(
-            enabled: true,
             mode: $mode,
             provider: 'openai',
             model: 'omni-moderation-latest',

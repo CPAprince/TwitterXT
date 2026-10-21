@@ -164,7 +164,6 @@ final class OpenAiTweetModerationProviderTest extends TestCase
     private function makeConfig(?string $apiKey = 'sk-test'): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: true,
             mode: ModerationMode::LIVE,
             provider: 'openai',
             model: 'omni-moderation-latest',

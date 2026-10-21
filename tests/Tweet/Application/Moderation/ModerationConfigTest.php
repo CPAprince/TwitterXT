@@ -67,45 +67,37 @@ final class ModerationConfigTest extends TestCase
     // ── mode helpers ──────────────────────────────────────────────────────────
 
     #[Test]
-    public function requiresLiveApiCallWhenEnabledAndLiveMode(): void
+    public function requiresLiveApiCallWhenLiveMode(): void
     {
-        $config = $this->makeConfig(['enabled' => true, 'mode' => ModerationMode::LIVE]);
+        $config = $this->makeConfig(['mode' => ModerationMode::LIVE]);
 
         self::assertTrue($config->requiresLiveApiCall());
         self::assertFalse($config->usesDemoMode());
         self::assertFalse($config->usesBypassMode());
+        self::assertTrue($config->isEnabled());
     }
 
     #[Test]
-    public function usesDemoModeWhenEnabledAndDemoMode(): void
+    public function usesDemoModeWhenDemoMode(): void
     {
-        $config = $this->makeConfig(['enabled' => true, 'mode' => ModerationMode::DEMO]);
+        $config = $this->makeConfig(['mode' => ModerationMode::DEMO]);
 
         self::assertFalse($config->requiresLiveApiCall());
         self::assertTrue($config->usesDemoMode());
         self::assertFalse($config->usesBypassMode());
+        self::assertTrue($config->isEnabled());
     }
 
     #[Test]
-    public function usesBypassModeWhenEnabledAndBypassMode(): void
+    public function usesBypassModeWhenBypassMode(): void
     {
-        $config = $this->makeConfig(['enabled' => true, 'mode' => ModerationMode::BYPASS]);
+        $config = $this->makeConfig(['mode' => ModerationMode::BYPASS]);
 
         self::assertFalse($config->requiresLiveApiCall());
         self::assertFalse($config->usesDemoMode());
         self::assertTrue($config->usesBypassMode());
-    }
-
-    #[Test]
-    public function alwaysUsesBypassModeWhenDisabledRegardlessOfMode(): void
-    {
-        foreach ([ModerationMode::LIVE, ModerationMode::DEMO, ModerationMode::BYPASS] as $mode) {
-            $config = $this->makeConfig(['enabled' => false, 'mode' => $mode]);
-
-            self::assertTrue($config->usesBypassMode(), "Expected bypass for mode {$mode->value} when disabled");
-            self::assertFalse($config->requiresLiveApiCall());
-            self::assertFalse($config->usesDemoMode());
-        }
+        self::assertTrue($config->isBypass());
+        self::assertFalse($config->isEnabled());
     }
 
     // ── hasApiKey ─────────────────────────────────────────────────────────────
@@ -139,7 +131,6 @@ final class ModerationConfigTest extends TestCase
     private function makeConfig(array $override = []): ModerationConfig
     {
         $defaults = [
-            'enabled' => true,
             'mode' => ModerationMode::LIVE,
             'provider' => 'openai',
             'model' => 'omni-moderation-latest',

@@ -120,6 +120,7 @@ services:
     Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandler:
         arguments:
             $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            $moderationPolicy: '@Twitter\Tweet\Application\Moderation\TweetModerationPolicy'
 
     Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandlerInterface: '@Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandler'
     
@@ -145,8 +146,16 @@ services:
     Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler:
         arguments:
             $tweetRepository: '@Twitter\Tweet\Domain\Tweet\Model\TweetRepository'
+            $moderationPolicy: '@Twitter\Tweet\Application\Moderation\TweetModerationPolicy'
     
     Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandlerInterface: '@Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler'
+
+    Twitter\Tweet\Application\Moderation\TweetModerationPolicy:
+        arguments:
+            $config: '@Twitter\Tweet\Application\Moderation\ModerationConfig'
+            $moderationQueue: '@Twitter\Tweet\Application\Moderation\ModerationQueueInterface'
+
+    Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface: '@Twitter\Tweet\Application\Moderation\TweetModerationPolicy'
 
     Twitter\Tweet\Application\UseCase\GetTweetModerationStatus\GetTweetModerationStatusCommandHandler:
         arguments:
@@ -255,7 +264,6 @@ services:
     Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory:
         public: true
         arguments:
-            $enabled: '%moderation.enabled%'
             $mode: '%moderation.mode%'
             $provider: '%moderation.provider%'
             $model: '%moderation.model%'

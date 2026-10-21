@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Twitter\Tweet\Application\UseCase\UpdateTweet;
 
 use Override;
-use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
+use Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetAccessDeniedException;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
 use Twitter\Tweet\Domain\Tweet\Model\Tweet;
@@ -15,7 +15,7 @@ final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHand
 {
     public function __construct(
         private TweetRepository $tweetRepository,
-        private ModerationQueueInterface $moderationQueue,
+        private TweetModerationPolicyInterface $moderationPolicy,
     ) {}
 
     /**
@@ -33,11 +33,11 @@ final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHand
 
         $contentChanged = $tweet->updateContent($command->content);
 
-        $this->tweetRepository->flush();
-
         if ($contentChanged) {
-            $this->moderationQueue->enqueue($tweet->id());
+            $this->moderationPolicy->onContentWritten($tweet);
         }
+
+        $this->tweetRepository->flush();
 
         $status = match ($tweet->moderationStatus()) {
             Tweet::MODERATION_APPROVED => 'approved',

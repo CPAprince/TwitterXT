@@ -10,7 +10,6 @@ use Twitter\Tweet\Application\Moderation\ModerationMode;
 final readonly class ModerationConfigFactory
 {
     public function __construct(
-        private bool $enabled,
         private string $mode,
         private string $provider,
         private string $model,
@@ -41,7 +40,6 @@ final readonly class ModerationConfigFactory
     public function create(): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: $this->enabled,
             mode: ModerationMode::fromString($this->mode),
             provider: $this->provider,
             model: $this->model,

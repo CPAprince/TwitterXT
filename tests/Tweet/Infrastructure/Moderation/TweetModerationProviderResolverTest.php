@@ -20,10 +20,10 @@ use Twitter\Tweet\Infrastructure\Moderation\TweetModerationProviderResolver;
 final class TweetModerationProviderResolverTest extends TestCase
 {
     #[Test]
-    public function resolvesOpenAiProviderWhenLiveModeAndEnabled(): void
+    public function resolvesOpenAiProviderWhenLiveMode(): void
     {
         // Arrange
-        $config = $this->makeConfig(enabled: true, mode: ModerationMode::LIVE);
+        $config = $this->makeConfig(mode: ModerationMode::LIVE);
         $resolver = $this->makeResolver($config);
 
         // Act & Assert
@@ -31,10 +31,10 @@ final class TweetModerationProviderResolverTest extends TestCase
     }
 
     #[Test]
-    public function resolvesDemoProviderWhenDemoModeAndEnabled(): void
+    public function resolvesDemoProviderWhenDemoMode(): void
     {
         // Arrange
-        $config = $this->makeConfig(enabled: true, mode: ModerationMode::DEMO);
+        $config = $this->makeConfig(mode: ModerationMode::DEMO);
         $resolver = $this->makeResolver($config);
 
         // Act & Assert
@@ -42,21 +42,10 @@ final class TweetModerationProviderResolverTest extends TestCase
     }
 
     #[Test]
-    public function resolvesBypassProviderWhenBypassModeAndEnabled(): void
+    public function resolvesBypassProviderWhenBypassMode(): void
     {
         // Arrange
-        $config = $this->makeConfig(enabled: true, mode: ModerationMode::BYPASS);
-        $resolver = $this->makeResolver($config);
-
-        // Act & Assert
-        self::assertInstanceOf(BypassTweetModerationProvider::class, $resolver->resolve());
-    }
-
-    #[Test]
-    public function resolvesBypassProviderWhenModerationIsDisabled(): void
-    {
-        // Arrange – even LIVE mode should resolve to bypass when disabled
-        $config = $this->makeConfig(enabled: false, mode: ModerationMode::LIVE);
+        $config = $this->makeConfig(mode: ModerationMode::BYPASS);
         $resolver = $this->makeResolver($config);
 
         // Act & Assert
@@ -70,16 +59,15 @@ final class TweetModerationProviderResolverTest extends TestCase
         $bypassProvider = new BypassTweetModerationProvider();
         $demoProvider = new DemoTweetModerationProvider($config);
         $openAiProvider = new OpenAiTweetModerationProvider(
-            $this->makeConfig(enabled: true, mode: ModerationMode::LIVE),
+            $this->makeConfig(mode: ModerationMode::LIVE),
         );
 
         return new TweetModerationProviderResolver($config, $demoProvider, $bypassProvider, $openAiProvider);
     }
 
-    private function makeConfig(bool $enabled, ModerationMode $mode): ModerationConfig
+    private function makeConfig(ModerationMode $mode): ModerationConfig
     {
         return new ModerationConfig(
-            enabled: $enabled,
             mode: $mode,
             provider: 'openai',
             model: 'omni-moderation-latest',

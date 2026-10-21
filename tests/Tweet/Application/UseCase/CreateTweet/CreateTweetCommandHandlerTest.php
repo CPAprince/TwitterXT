@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
+use Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommand;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandler;
 use Twitter\Tweet\Domain\Tweet\Exception\UserNotFoundException;
@@ -23,13 +23,13 @@ final class CreateTweetCommandHandlerTest extends TestCase
 {
     private CreateTweetCommandHandler $handler;
     private MockObject|TweetRepository $tweetRepository;
-    private MockObject|ModerationQueueInterface $moderationQueue;
+    private MockObject|TweetModerationPolicyInterface $moderationPolicy;
 
     protected function setUp(): void
     {
         $this->tweetRepository = $this->createMock(TweetRepository::class);
-        $this->moderationQueue = $this->createMock(ModerationQueueInterface::class);
-        $this->handler = new CreateTweetCommandHandler($this->tweetRepository, $this->moderationQueue);
+        $this->moderationPolicy = $this->createMock(TweetModerationPolicyInterface::class);
+        $this->handler = new CreateTweetCommandHandler($this->tweetRepository, $this->moderationPolicy);
     }
 
     #[Test]
@@ -52,10 +52,10 @@ final class CreateTweetCommandHandlerTest extends TestCase
                     && '' !== $tweet->id()
             ));
 
-        $this->moderationQueue
+        $this->moderationPolicy
             ->expects(self::once())
-            ->method('enqueue')
-            ->with(self::isType('string'));
+            ->method('onContentWritten')
+            ->with(self::isInstanceOf(Tweet::class));
 
         $result = $this->handler->handle($command);
 

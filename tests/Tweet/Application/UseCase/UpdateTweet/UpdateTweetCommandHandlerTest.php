@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Twitter\Tweet\Application\Moderation\ModerationQueueInterface;
+use Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface;
 use Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommand;
 use Twitter\Tweet\Application\UseCase\UpdateTweet\UpdateTweetCommandHandler;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetAccessDeniedException;
@@ -24,13 +24,13 @@ final class UpdateTweetCommandHandlerTest extends TestCase
 {
     private UpdateTweetCommandHandler $handler;
     private MockObject|TweetRepository $tweetRepository;
-    private MockObject|ModerationQueueInterface $moderationQueue;
+    private MockObject|TweetModerationPolicyInterface $moderationPolicy;
 
     protected function setUp(): void
     {
         $this->tweetRepository = $this->createMock(TweetRepository::class);
-        $this->moderationQueue = $this->createMock(ModerationQueueInterface::class);
-        $this->handler = new UpdateTweetCommandHandler($this->tweetRepository, $this->moderationQueue);
+        $this->moderationPolicy = $this->createMock(TweetModerationPolicyInterface::class);
+        $this->handler = new UpdateTweetCommandHandler($this->tweetRepository, $this->moderationPolicy);
     }
 
     /**
@@ -57,10 +57,10 @@ final class UpdateTweetCommandHandlerTest extends TestCase
             ->expects(self::once())
             ->method('flush');
 
-        $this->moderationQueue
+        $this->moderationPolicy
             ->expects(self::once())
-            ->method('enqueue')
-            ->with($tweetId);
+            ->method('onContentWritten')
+            ->with($tweet);
 
         $command = new UpdateTweetCommand(
             '123e4567-e89b-12d3-a456-426614174000',
@@ -96,9 +96,9 @@ final class UpdateTweetCommandHandlerTest extends TestCase
             ->expects(self::never())
             ->method('flush');
 
-        $this->moderationQueue
+        $this->moderationPolicy
             ->expects(self::never())
-            ->method('enqueue');
+            ->method('onContentWritten');
 
         $command = new UpdateTweetCommand(
             'definitely-not-the-owner-id',
@@ -126,9 +126,9 @@ final class UpdateTweetCommandHandlerTest extends TestCase
             ->expects(self::never())
             ->method('flush');
 
-        $this->moderationQueue
+        $this->moderationPolicy
             ->expects(self::never())
-            ->method('enqueue');
+            ->method('onContentWritten');
 
         $command = new UpdateTweetCommand(
             '123e4567-e89b-12d3-a456-426614174000',
