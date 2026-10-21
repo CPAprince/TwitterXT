@@ -13,6 +13,8 @@
         "doctrine/orm": "^3.6.2",
         "gesdinet/jwt-refresh-token-bundle": "^1.5",
         "lexik/jwt-authentication-bundle": "^3.2",
+        "nyholm/psr7": "*",
+        "openai-php/client": "*",
         "phpstan/phpdoc-parser": "^2.3.2",
         "promphp/prometheus_client_php": "^2.14.1",
         "runtime/frankenphp-symfony": "^0.2.0",
