@@ -12,4 +12,9 @@ interface ModerationStatusUpdaterInterface
      * @return list<ModerationDecision> The decisions that actually updated a row in the database
      */
     public function apply(array $decisions): array;
+
+    /**
+     * @param list<string> $tweetIds
+     */
+    public function markFailed(array $tweetIds): void;
 }

@@ -13,6 +13,7 @@ final class Tweet
     public const int MODERATION_PENDING = 0;
     public const int MODERATION_APPROVED = 1;
     public const int MODERATION_REJECTED = 2;
+    public const int MODERATION_FAILED = 3;
 
     private int $moderationVersion = 1;
 

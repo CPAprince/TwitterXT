@@ -103,8 +103,8 @@ final class TweetModerationPolicyTest extends TestCase
             redisRateReqPrefix: 'moderation:rate:req:',
             redisRateTokPrefix: 'moderation:rate:tok:',
             redisRateReqDayPrefix: 'moderation:rate:reqday:',
-            workerIdleSleepMs: 300,
-            workerLockTtlSeconds: 5,
+            workerIdleSleepMs: 1000,
+            workerLockTtlSeconds: 30,
             workerMaxFetchItems: 100,
         );
     }

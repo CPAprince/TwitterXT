@@ -61,6 +61,9 @@ final class ModerationConfigTest extends TestCase
             'workerIdleSleepMs zero' => [['workerIdleSleepMs' => 0]],
             'workerLockTtlSeconds zero' => [['workerLockTtlSeconds' => 0]],
             'workerMaxFetchItems zero' => [['workerMaxFetchItems' => 0]],
+            'httpTimeout zero' => [['httpTimeout' => 0]],
+            'httpMaxDuration zero' => [['httpMaxDuration' => 0]],
+            'workerLockTtlSeconds less than or equal to httpMaxDuration' => [['workerLockTtlSeconds' => 15, 'httpMaxDuration' => 15]],
         ];
     }
 

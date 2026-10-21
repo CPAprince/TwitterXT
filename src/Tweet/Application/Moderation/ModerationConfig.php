@@ -34,6 +34,9 @@ final readonly class ModerationConfig
         public int $workerIdleSleepMs,
         public int $workerLockTtlSeconds,
         public int $workerMaxFetchItems,
+
+        public int $httpTimeout = 10,
+        public int $httpMaxDuration = 15,
     ) {
         $this->assertValid();
     }
@@ -90,6 +93,18 @@ final readonly class ModerationConfig
 
         if ($this->workerMaxFetchItems <= 0) {
             throw new InvalidArgumentException('moderation.worker.max_fetch_items must be greater than 0.');
+        }
+
+        if ($this->httpTimeout <= 0) {
+            throw new InvalidArgumentException('moderation.http.timeout must be greater than 0.');
+        }
+
+        if ($this->httpMaxDuration <= 0) {
+            throw new InvalidArgumentException('moderation.http.max_duration must be greater than 0.');
+        }
+
+        if ($this->workerLockTtlSeconds <= $this->httpMaxDuration) {
+            throw new InvalidArgumentException('moderation.worker.lock_ttl_seconds must be greater than moderation.http.max_duration.');
         }
     }
 

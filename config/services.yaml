@@ -269,10 +269,6 @@ services:
         arguments:
             $redis: '@moderation.redis'
 
-    Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock:
-        arguments:
-            $redis: '@moderation.redis'
-
     Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory:
         arguments:
             $mode: '%moderation.mode%'
@@ -301,6 +297,9 @@ services:
             $workerLockTtlSeconds: '%moderation.worker.lock_ttl_seconds%'
             $workerMaxFetchItems: '%moderation.worker.max_fetch_items%'
 
+            $httpTimeout: '%moderation.http.timeout%'
+            $httpMaxDuration: '%moderation.http.max_duration%'
+
     Twitter\Tweet\Application\Moderation\ModerationConfig:
         factory: [ '@Twitter\Tweet\Infrastructure\Moderation\ModerationConfigFactory', 'create' ]
 
@@ -324,14 +323,14 @@ services:
         arguments:
             $cacheTweets: '@cache.tweets'
 
-    Twitter\Tweet\Application\Moderation\ModerationWorkerLockInterface:
-        alias: Twitter\Tweet\Infrastructure\Moderation\RedisModerationWorkerLock
-
     Twitter\Tweet\UI\CLI\TestModerationProviderCommand:
         tags: [ 'console.command' ]
 
     Twitter\Tweet\UI\CLI\ModerationFlushWorkerCommand:
         tags: [ 'console.command' ]
+        arguments:
+            $lockFactory: '@lock.factory'
+            $connection: '@doctrine.dbal.default_connection'
 
     app.login_rate_limiter:
         class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter

@@ -35,6 +35,9 @@ final readonly class ModerationConfigFactory
         private int $workerIdleSleepMs,
         private int $workerLockTtlSeconds,
         private int $workerMaxFetchItems,
+
+        private int $httpTimeout = 10,
+        private int $httpMaxDuration = 15,
     ) {}
 
     public function create(): ModerationConfig
@@ -65,6 +68,9 @@ final readonly class ModerationConfigFactory
             workerIdleSleepMs: $this->workerIdleSleepMs,
             workerLockTtlSeconds: $this->workerLockTtlSeconds,
             workerMaxFetchItems: $this->workerMaxFetchItems,
+
+            httpTimeout: $this->httpTimeout,
+            httpMaxDuration: $this->httpMaxDuration,
         );
     }
 

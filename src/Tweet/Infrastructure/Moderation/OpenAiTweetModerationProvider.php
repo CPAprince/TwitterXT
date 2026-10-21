@@ -7,6 +7,8 @@ namespace Twitter\Tweet\Infrastructure\Moderation;
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
 use RuntimeException;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
 use Twitter\Tweet\Application\Moderation\ModerationBatchItem;
 use Twitter\Tweet\Application\Moderation\ModerationConfig;
 use Twitter\Tweet\Application\Moderation\ModerationDecision;
@@ -29,7 +31,13 @@ final class OpenAiTweetModerationProvider implements TweetModerationProviderInte
             throw new RuntimeException('OPENAI_API_KEY is not configured.');
         }
 
-        $this->client = OpenAI::client($this->config->apiKey);
+        $this->client = OpenAI::factory()
+            ->withApiKey($this->config->apiKey)
+            ->withHttpClient(new Psr18Client(HttpClient::create([
+                'timeout' => $this->config->httpTimeout,
+                'max_duration' => $this->config->httpMaxDuration,
+            ])))
+            ->make();
 
         return $this->client;
     }

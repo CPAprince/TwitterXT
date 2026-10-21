@@ -56,6 +56,40 @@ final class ModerationConfigFactoryTest extends TestCase
         self::assertSame(ModerationMode::BYPASS, $this->makeFactory(mode: 'bypass')->create()->mode);
     }
 
+    #[Test]
+    public function createPassesHttpTimeouts(): void
+    {
+        $factory = new ModerationConfigFactory(
+            mode: 'live',
+            provider: 'openai',
+            model: 'omni-moderation-latest',
+            apiKey: 'sk-test-key',
+            batchMaxItems: 10,
+            batchSoftTokenCap: 1_000,
+            batchHardTokenCap: 2_000,
+            batchFlushIntervalMs: 500,
+            limitRpm: 60,
+            limitTpm: 100_000,
+            limitRpd: 1_000,
+            demoApprovePercent: 80,
+            redisQueueKey: 'moderation:queue',
+            redisFlushLockKey: 'moderation:lock',
+            redisRateReqPrefix: 'moderation:rate:req:',
+            redisRateTokPrefix: 'moderation:rate:tok:',
+            redisRateReqDayPrefix: 'moderation:rate:day:',
+            workerIdleSleepMs: 1_000,
+            workerLockTtlSeconds: 60,
+            workerMaxFetchItems: 100,
+            httpTimeout: 12,
+            httpMaxDuration: 20,
+        );
+
+        $config = $factory->create();
+
+        self::assertSame(12, $config->httpTimeout);
+        self::assertSame(20, $config->httpMaxDuration);
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────────
 
     private function makeFactory(

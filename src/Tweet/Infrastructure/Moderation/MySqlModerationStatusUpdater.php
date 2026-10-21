@@ -65,4 +65,38 @@ final readonly class MySqlModerationStatusUpdater implements ModerationStatusUpd
 
         return $applied;
     }
+
+    /**
+     * @param list<string> $tweetIds
+     */
+    public function markFailed(array $tweetIds): void
+    {
+        if ([] === $tweetIds) {
+            return;
+        }
+
+        $sql = '
+            UPDATE tweets
+            SET moderation_status = ?,
+                moderated_at = UTC_TIMESTAMP()
+            WHERE id = ?
+              AND moderation_status = ?
+        ';
+
+        foreach ($tweetIds as $tweetId) {
+            $this->connection->executeStatement(
+                $sql,
+                [
+                    Tweet::MODERATION_FAILED,
+                    UuidBinaryConverter::toBytes($tweetId),
+                    Tweet::MODERATION_PENDING,
+                ],
+                [
+                    ParameterType::INTEGER,
+                    ParameterType::BINARY,
+                    ParameterType::INTEGER,
+                ]
+            );
+        }
+    }
 }

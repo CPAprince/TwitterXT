@@ -32,7 +32,11 @@ parameters:
     moderation.redis.rate_tok_prefix: 'moderation:rate:tok:'
     moderation.redis.rate_req_day_prefix: 'moderation:rate:reqday:'
     
+    # http client settings for live provider
+    moderation.http.timeout: 10
+    moderation.http.max_duration: 15
+
     # worker behavior
-    moderation.worker.idle_sleep_ms: 300
-    moderation.worker.lock_ttl_seconds: 5
+    moderation.worker.idle_sleep_ms: 1000
+    moderation.worker.lock_ttl_seconds: 30
     moderation.worker.max_fetch_items: 100
