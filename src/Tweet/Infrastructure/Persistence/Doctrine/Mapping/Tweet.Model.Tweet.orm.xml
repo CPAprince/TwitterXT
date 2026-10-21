@@ -26,6 +26,19 @@
         </field>
         <field name="createdAt" column="created_at" type="datetime_immutable" updatable="false"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+        <field name="moderationStatus" column="moderation_status" type="integer">
+            <options>
+                <option name="unsigned">true</option>
+                <option name="default">0</option>
+            </options>
+        </field>
+        <field name="moderatedAt" column="moderated_at" type="datetime_immutable" nullable="true"/>
+        <field name="moderationVersion" column="moderation_version" type="integer">
+            <options>
+                <option name="unsigned">true</option>
+                <option name="default">1</option>
+            </options>
+        </field>
 
     </entity>
 
