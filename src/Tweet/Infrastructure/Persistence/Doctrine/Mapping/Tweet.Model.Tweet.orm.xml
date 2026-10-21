@@ -8,8 +8,8 @@
             table="tweets">
 
         <indexes>
-            <index name="idx_tweets_created_id" columns="created_at,id"/>
-            <index name="idx_tweets_user_created_id" columns="user_id,created_at,id"/>
+            <index name="idx_tweets_created_id" columns="moderation_status,created_at,id"/>
+            <index name="idx_tweets_user_created_id" columns="user_id,moderation_status,created_at,id"/>
         </indexes>
 
         <id name="id" column="id" type="uuid">
