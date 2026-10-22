@@ -16,6 +16,8 @@ use Twitter\Like\Domain\Like\Event\TweetWasLiked;
 use Twitter\Like\Domain\Like\Event\TweetWasUnliked;
 use Twitter\Like\Domain\Like\Model\Like;
 use Twitter\Like\Domain\Like\Model\LikeRepository;
+use Twitter\Tweet\Application\Port\TweetReadPortInterface;
+use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
 
 #[Group('unit')]
 #[CoversMethod(ToggleLikeCommandHandler::class, 'handle')]
@@ -24,15 +26,18 @@ final class ToggleLikeCommandHandlerTest extends TestCase
     private ToggleLikeCommandHandler $handler;
     private LikeRepository&MockObject $likeRepository;
     private EventDispatcherInterface&MockObject $eventDispatcher;
+    private TweetReadPortInterface&MockObject $tweetReadPort;
 
     protected function setUp(): void
     {
         $this->likeRepository = $this->createMock(LikeRepository::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->tweetReadPort = $this->createMock(TweetReadPortInterface::class);
 
         $this->handler = new ToggleLikeCommandHandler(
             $this->likeRepository,
             $this->eventDispatcher,
+            $this->tweetReadPort,
         );
     }
 
@@ -70,6 +75,11 @@ final class ToggleLikeCommandHandlerTest extends TestCase
                 ),
             );
 
+        $this->tweetReadPort
+            ->method('isApproved')
+            ->with($tweetId)
+            ->willReturn(true);
+
         $result = $this->handler->handle($command);
 
         self::assertTrue($result->liked, 'Result should indicate that the tweet was liked');
@@ -83,6 +93,11 @@ final class ToggleLikeCommandHandlerTest extends TestCase
 
         $command = new ToggleLikeCommand(tweetId: $tweetId, userId: $userId);
         $existingLike = Like::create($tweetId, $userId);
+
+        $this->tweetReadPort
+            ->method('isApproved')
+            ->with($tweetId)
+            ->willReturn(true);
 
         $this->likeRepository
             ->method('findOneByTweetAndUser')
@@ -108,5 +123,24 @@ final class ToggleLikeCommandHandlerTest extends TestCase
         $result = $this->handler->handle($command);
 
         self::assertFalse($result->liked, 'Result should indicate that the tweet was unliked');
+    }
+
+    #[Test]
+    public function handleThrowsTweetNotFoundExceptionWhenTweetIsNotApproved(): void
+    {
+        $tweetId = '019b5f3f-d110-7908-9177-5df439942a8b';
+        $userId = '550e8400-e29b-41d4-a716-446655440000';
+
+        $command = new ToggleLikeCommand(tweetId: $tweetId, userId: $userId);
+
+        $this->tweetReadPort
+            ->expects(self::once())
+            ->method('isApproved')
+            ->with($tweetId)
+            ->willReturn(false);
+
+        $this->expectException(TweetNotFoundException::class);
+
+        $this->handler->handle($command);
     }
 }

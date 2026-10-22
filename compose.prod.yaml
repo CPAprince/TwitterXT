@@ -16,6 +16,14 @@ services:
       APP_ENV: prod
       APP_DEBUG: 0
 
+  moderation-worker:
+    build:
+      context: .
+      target: frankenphp_prod
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+
   database:
     environment:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}

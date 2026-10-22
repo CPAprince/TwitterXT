@@ -10,7 +10,20 @@ use Symfony\Component\Uid\Uuid;
 
 final class Tweet
 {
+    public const int MODERATION_PENDING = 0;
+    public const int MODERATION_APPROVED = 1;
+    public const int MODERATION_REJECTED = 2;
+    public const int MODERATION_FAILED = 3;
+
+    private int $moderationVersion = 1;
+
     private int $likesCount = 0;
+
+    private int $moderationStatus = self::MODERATION_PENDING;
+
+    private ?DateTimeImmutable $moderatedAt = null;
+
+    private ?string $moderationReason = null;
 
     private function __construct(
         private readonly string $id,
@@ -49,14 +62,22 @@ final class Tweet
         return $this->content;
     }
 
-    public function updateContent(string $content): void
+    public function updateContent(string $content): bool
     {
         Assert::lazy()
             ->that($content, 'content')->notBlank()->maxLength(280)
             ->verifyNow();
 
+        if ($this->content === $content) {
+            return false;
+        }
+
         $this->content = $content;
         $this->updatedAt = new DateTimeImmutable();
+        ++$this->moderationVersion;
+        $this->resetModeration();
+
+        return true;
     }
 
     public function createdAt(): DateTimeImmutable
@@ -84,5 +105,46 @@ final class Tweet
         if ($this->likesCount > 0) {
             --$this->likesCount;
         }
+    }
+
+    public function moderationStatus(): int
+    {
+        return $this->moderationStatus;
+    }
+
+    public function moderatedAt(): ?DateTimeImmutable
+    {
+        return $this->moderatedAt;
+    }
+
+    public function moderationReason(): ?string
+    {
+        return $this->moderationReason;
+    }
+
+    public function resetModeration(): void
+    {
+        $this->moderationStatus = self::MODERATION_PENDING;
+        $this->moderatedAt = null;
+        $this->moderationReason = null;
+    }
+
+    public function approveModeration(): void
+    {
+        $this->moderationStatus = self::MODERATION_APPROVED;
+        $this->moderatedAt = new DateTimeImmutable();
+        $this->moderationReason = null;
+    }
+
+    public function rejectModeration(?string $reason = null): void
+    {
+        $this->moderationStatus = self::MODERATION_REJECTED;
+        $this->moderatedAt = new DateTimeImmutable();
+        $this->moderationReason = $reason;
+    }
+
+    public function moderationVersion(): int
+    {
+        return $this->moderationVersion;
     }
 }

@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Twitter\Shared\Infrastructure\Persistence\Doctrine\UuidBinaryConverter;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
 use Twitter\Tweet\Domain\Tweet\Exception\UserNotFoundException;
 use Twitter\Tweet\Domain\Tweet\Model\Tweet;
@@ -38,6 +39,7 @@ final class MySQLTweetRepositoryTest extends TestCase
         // Arrange
         $userId = '019b5f3f-d110-7908-9177-5df439942a8b';
         $tweet = Tweet::create($userId, 'Hello');
+        $tweet->approveModeration();
         $tweetId = $tweet->id();
 
         $this->entityManager
@@ -148,7 +150,7 @@ final class MySQLTweetRepositoryTest extends TestCase
         $repo
             ->expects(self::once())
             ->method('findBy')
-            ->with([], ['createdAt' => 'DESC'], 10, 0)
+            ->with(['moderationStatus' => Tweet::MODERATION_APPROVED], ['createdAt' => 'DESC'], 10, 0)
             ->willReturn($expected);
 
         // Act
@@ -166,7 +168,7 @@ final class MySQLTweetRepositoryTest extends TestCase
         $expected = [Tweet::create('019b5f3f-d110-7908-9177-5df439942a8b', 'Hello')];
 
         $userId = '550e8400-e29b-41d4-a716-446655440000';
-        $expectedBinaryUserId = pack('H*', str_replace('-', '', $userId));
+        $expectedBinaryUserId = UuidBinaryConverter::toBytes($userId);
 
         $this->entityManager
             ->expects(self::once())
@@ -177,7 +179,11 @@ final class MySQLTweetRepositoryTest extends TestCase
         $repo
             ->expects(self::once())
             ->method('findBy')
-            ->with(['userId' => $expectedBinaryUserId], ['createdAt' => 'DESC'], 10, 0)
+            ->with([
+                'userId' => $expectedBinaryUserId,
+                'moderationStatus' => Tweet::MODERATION_APPROVED,
+            ],
+                ['createdAt' => 'DESC'], 10, 0)
             ->willReturn($expected);
 
         // Act
@@ -204,7 +210,7 @@ final class MySQLTweetRepositoryTest extends TestCase
         $repo
             ->expects(self::once())
             ->method('findBy')
-            ->with([], ['createdAt' => 'DESC'], $expectedLimit, $expectedOffset)
+            ->with(['moderationStatus' => Tweet::MODERATION_APPROVED], ['createdAt' => 'DESC'], $expectedLimit, $expectedOffset)
             ->willReturn($expected);
 
         // Act

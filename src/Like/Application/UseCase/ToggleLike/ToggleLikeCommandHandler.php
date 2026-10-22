@@ -11,20 +11,28 @@ use Twitter\Like\Domain\Like\Event\TweetWasUnliked;
 use Twitter\Like\Domain\Like\Exception\LikeAlreadyExistsException;
 use Twitter\Like\Domain\Like\Model\Like;
 use Twitter\Like\Domain\Like\Model\LikeRepository;
+use Twitter\Tweet\Application\Port\TweetReadPortInterface;
+use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
 
 final readonly class ToggleLikeCommandHandler implements ToggleLikeCommandHandlerInterface
 {
     public function __construct(
         private LikeRepository $likeRepository,
         private EventDispatcherInterface $eventDispatcher,
+        private TweetReadPortInterface $tweetReadPort,
     ) {}
 
     /**
+     * @throws TweetNotFoundException
      * @throws LikeAlreadyExistsException
      */
     #[Override]
     public function handle(ToggleLikeCommand $command): ToggleLikeCommandResult
     {
+        if (!$this->tweetReadPort->isApproved($command->tweetId)) {
+            throw new TweetNotFoundException($command->tweetId);
+        }
+
         $existingLike = $this->likeRepository->findOneByTweetAndUser(
             $command->tweetId,
             $command->userId,

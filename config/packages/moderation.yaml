@@ -1,0 +1,43 @@
+parameters:
+    # live   - live request to OpenAI
+    # demo   - simulate moderation without requests to OpenAI API
+    # bypass - moderation turned off, all approves automatically
+    moderation.mode: '%env(MODERATION_MODE)%'
+    
+    # OpenAI
+    moderation.provider: 'openai'
+    moderation.model: '%env(MODERATION_MODEL)%'
+    moderation.api_key: '%env(OPENAI_API_KEY)%'
+    
+    # batching policy
+    moderation.batch.max_items: '%env(int:MODERATION_BATCH_MAX_ITEMS)%'
+    moderation.batch.soft_token_cap: '%env(int:MODERATION_BATCH_SOFT_TOKEN_CAP)%'
+    moderation.batch.hard_token_cap: '%env(int:MODERATION_BATCH_HARD_TOKEN_CAP)%'
+    moderation.batch.flush_interval_ms: '%env(int:MODERATION_BATCH_FLUSH_INTERVAL_MS)%'
+    
+    # runtime rate limits for live moderation
+    # OpenAI Tier limits for omni-moderation-latest:
+    # Free:  240 RPM /  9,500 TPM / 4,900 RPD (with ~5% margin below 250 / 10k / 5k)
+    # Build: 475 RPM / 19,000 TPM /     0 RPD (0 = no daily limit; default tier)
+    # Launch: 1900 RPM / 240,000 TPM /     0 RPD
+    # Grow:   4750 RPM / 480,000 TPM /     0 RPD
+    moderation.limits.rpm: '%env(int:MODERATION_LIMIT_RPM)%'
+    moderation.limits.tpm: '%env(int:MODERATION_LIMIT_TPM)%'
+    moderation.limits.rpd: '%env(int:MODERATION_LIMIT_RPD)%'
+    
+    # demo mode settings
+    moderation.demo.approve_percent: '%env(int:MODERATION_DEMO_APPROVE_PERCENT)%'
+    
+    # redis prefixes for rate limiter
+    moderation.redis.rate_req_prefix: 'moderation:rate:req:'
+    moderation.redis.rate_tok_prefix: 'moderation:rate:tok:'
+    moderation.redis.rate_req_day_prefix: 'moderation:rate:reqday:'
+    
+    # http client settings for live provider
+    moderation.http.timeout: 10
+    moderation.http.max_duration: 15
+
+    # worker behavior
+    moderation.worker.idle_sleep_ms: 1000
+    moderation.worker.lock_ttl_seconds: 30
+    moderation.worker.max_fetch_items: 100

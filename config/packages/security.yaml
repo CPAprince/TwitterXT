@@ -39,6 +39,7 @@ security:
         - { path: ^/api/users, roles: PUBLIC_ACCESS }
         - { path: ^/api/registration, roles: PUBLIC_ACCESS }
         - { path: ^/api/profiles, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/tweets/[^/]+/moderation-status$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/tweets, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/tokens, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh$, roles: PUBLIC_ACCESS }

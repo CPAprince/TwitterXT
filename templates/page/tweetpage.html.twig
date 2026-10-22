@@ -20,7 +20,8 @@
             <span class="fw-bold me-2" tweet_author>{ tweet.author.name }</span>
             <span class="text-muted" tweet_createdAt>
                 · { tweet.createdAt|date('H:i') }
-        </span>
+            </span>
+            <span class="badge bg-warning text-dark ms-2 d-none" data-tweet-pending-badge>Pending moderation</span>
         </div>
 
         <div class="tweet-content-display">
@@ -83,13 +84,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const tweetId = window.location.pathname.replace('/t/', '');
+            const tweetId = window.location.pathname.replace('/t/', '').replace(/\/$/, '');
             console.log('tweetId: ', tweetId);
             const tweetData = await getTweet(tweetId);
             if (tweetData) {
                 showTweet(tweetData);
-                await window.Tweets.applyLikedState();
+                await window.Tweets?.applyLikedState?.();
                 return;
+            }
+
+            if (window.PendingTweets) {
+                const pending = window.PendingTweets.getById(tweetId);
+                if (pending) {
+                    showTweet({
+                        id: pending.id,
+                        author: { id: pending.authorId, name: pending.authorName || 'You' },
+                        createdAt: pending.createdAt,
+                        content: pending.content,
+                        likesCount: 0,
+                        isPending: true,
+                    });
+                    window.PendingTweets.startPolling();
+                    return;
+                }
             }
 
             const errorBlock = document.getElementById('tweet-error');
@@ -100,8 +117,8 @@
     </script>
     <script src="{{ asset('js/alert.js') }}"></script>
     <script src="{{ asset('js/loading.js') }}"></script>
+    <script src="{{ asset('js/pending_tweets.js') }}"></script>
     <script src="{{ asset('js/tweet.js') }}"></script>
     <script src="{{ asset('js/tweets.js') }}"></script>
     <script src="{{ asset('js/auth.js') }}"></script>
-
 {% endblock %}

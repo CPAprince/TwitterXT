@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Twitter\Tweet\Application\UseCase\UpdateTweet;
 
 use Override;
+use Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetAccessDeniedException;
 use Twitter\Tweet\Domain\Tweet\Exception\TweetNotFoundException;
+use Twitter\Tweet\Domain\Tweet\Model\Tweet;
 use Twitter\Tweet\Domain\Tweet\Model\TweetRepository;
 
 final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHandlerInterface
 {
-    public function __construct(private TweetRepository $tweetRepository) {}
+    public function __construct(
+        private TweetRepository $tweetRepository,
+        private TweetModerationPolicyInterface $moderationPolicy,
+    ) {}
 
     /**
      * @throws TweetAccessDeniedException
@@ -26,9 +31,20 @@ final readonly class UpdateTweetCommandHandler implements UpdateTweetCommandHand
             throw new TweetAccessDeniedException($command->userId);
         }
 
-        $tweet->updateContent($command->content);
+        $contentChanged = $tweet->updateContent($command->content);
+
+        if ($contentChanged) {
+            $this->moderationPolicy->onContentWritten($tweet);
+        }
+
         $this->tweetRepository->flush();
 
-        return new UpdateTweetCommandResult($tweet->content(), $tweet->updatedAt());
+        $status = match ($tweet->moderationStatus()) {
+            Tweet::MODERATION_APPROVED => 'approved',
+            Tweet::MODERATION_REJECTED => 'rejected',
+            default => 'pending',
+        };
+
+        return new UpdateTweetCommandResult($tweet->content(), $tweet->updatedAt(), $status);
     }
 }

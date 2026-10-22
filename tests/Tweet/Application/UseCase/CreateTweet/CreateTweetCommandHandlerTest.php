@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Twitter\Tweet\Application\Moderation\TweetModerationPolicyInterface;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommand;
 use Twitter\Tweet\Application\UseCase\CreateTweet\CreateTweetCommandHandler;
 use Twitter\Tweet\Domain\Tweet\Exception\UserNotFoundException;
@@ -22,11 +23,13 @@ final class CreateTweetCommandHandlerTest extends TestCase
 {
     private CreateTweetCommandHandler $handler;
     private MockObject|TweetRepository $tweetRepository;
+    private MockObject|TweetModerationPolicyInterface $moderationPolicy;
 
     protected function setUp(): void
     {
         $this->tweetRepository = $this->createMock(TweetRepository::class);
-        $this->handler = new CreateTweetCommandHandler($this->tweetRepository);
+        $this->moderationPolicy = $this->createMock(TweetModerationPolicyInterface::class);
+        $this->handler = new CreateTweetCommandHandler($this->tweetRepository, $this->moderationPolicy);
     }
 
     #[Test]
@@ -49,9 +52,15 @@ final class CreateTweetCommandHandlerTest extends TestCase
                     && '' !== $tweet->id()
             ));
 
+        $this->moderationPolicy
+            ->expects(self::once())
+            ->method('onContentWritten')
+            ->with(self::isInstanceOf(Tweet::class));
+
         $result = $this->handler->handle($command);
 
         self::assertNotEmpty($result->tweetId);
+        self::assertSame('pending', $result->moderationStatus);
     }
 
     #[Test]

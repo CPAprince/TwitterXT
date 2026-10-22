@@ -12,5 +12,6 @@ final readonly class CreateTweetCommandResult
         public string $tweetId,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
+        public string $moderationStatus = 'pending',
     ) {}
 }

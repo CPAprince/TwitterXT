@@ -8,8 +8,8 @@
             table="tweets">
 
         <indexes>
-            <index name="idx_tweets_created_id" columns="created_at,id"/>
-            <index name="idx_tweets_user_created_id" columns="user_id,created_at,id"/>
+            <index name="idx_tweets_created_id" columns="moderation_status,created_at,id"/>
+            <index name="idx_tweets_user_created_id" columns="user_id,moderation_status,created_at,id"/>
         </indexes>
 
         <id name="id" column="id" type="uuid">
@@ -26,6 +26,20 @@
         </field>
         <field name="createdAt" column="created_at" type="datetime_immutable" updatable="false"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+        <field name="moderationStatus" column="moderation_status" type="smallint">
+            <options>
+                <option name="unsigned">true</option>
+                <option name="default">0</option>
+            </options>
+        </field>
+        <field name="moderatedAt" column="moderated_at" type="datetime_immutable" nullable="true"/>
+        <field name="moderationVersion" column="moderation_version" type="integer">
+            <options>
+                <option name="unsigned">true</option>
+                <option name="default">1</option>
+            </options>
+        </field>
+        <field name="moderationReason" column="moderation_reason" type="string" length="255" nullable="true"/>
 
     </entity>
 

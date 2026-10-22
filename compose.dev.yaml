@@ -35,6 +35,18 @@ services:
       - /app/var
       - /app/vendor
 
+  moderation-worker:
+    build:
+      context: .
+      target: frankenphp_dev
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+    volumes:
+      - ./:/app
+      - /app/var
+      - /app/vendor
+
 ###> symfony/mercure-bundle ###
   mercure:
     ports:

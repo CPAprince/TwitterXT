@@ -19,3 +19,8 @@ framework:
             policy: 'sliding_window'
             limit: '%env(int:RATE_LIMIT_LOGIN_GLOBAL)%'
             interval: '15 minutes'
+
+        moderation_status_poll:
+            policy: 'token_bucket'
+            limit: '%env(int:RATE_LIMIT_MODERATION_STATUS_POLL)%'
+            rate: { interval: '1 minute', amount: 30 }

@@ -112,6 +112,7 @@ window.Auth = {
     } catch (error) {
       console.error('[Auth.logout] Logout request failed (will still clear tokens):', error);
     } finally {
+      window.PendingTweets?.clearCurrent?.();
       Api.clearToken();
       this.updateNavVisibility();
       window.location.href = window.routes?.successRedirect || '/';
@@ -137,6 +138,7 @@ if (window.Api && window.Auth) {
 
   const originalClearToken = Api.clearToken.bind(Api);
   Api.clearToken = () => {
+    window.PendingTweets?.clearCurrent?.();
     originalClearToken();
     window.Auth.updateNavVisibility();
     window.Tweets?.applyLikeButtonState?.();
